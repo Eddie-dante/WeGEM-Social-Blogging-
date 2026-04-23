@@ -33,6 +33,7 @@
         .notice { background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #856404; font-size: 13px; }
         .author { color: #0066cc; font-weight: bold; margin-bottom: 8px; }
         .empty { text-align: center; padding: 30px; color: #999; }
+        #debugInfo { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #666; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -40,54 +41,91 @@
         <div class="container" style="text-align:center; padding-top:100px;">
             <div class="logo"><span>by</span> WEEM</div>
             <p>Loading...</p>
+            <div id="debugInfo"></div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // =============================================
-        // 🔑 YOUR SUPABASE KEYS (Already correct from test!)
+        // 🔑 PUT YOUR ACTUAL KEYS HERE
         // =============================================
         const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
         const SUPABASE_KEY = 'sb_publishable_Hgb_4yGVSkCSSkKf4bN1lQ_Ndsz1yD-'
 
+        // Show debug info
+        const debugDiv = document.getElementById('debugInfo')
         let supabase
         const app = document.getElementById('app')
         let currentUser = null
 
-        // Wait for Supabase to fully load
+        function debug(msg) {
+            debugDiv.innerHTML += '<br>' + msg
+            console.log(msg)
+        }
+
+        debug('🟢 Step 1: Script started')
+
+        // Check keys
+        if (SUPABASE_URL.includes('YOUR-PROJECT')) {
+            debug('🔴 ERROR: You have not updated SUPABASE_URL!')
+            debug('Current URL: ' + SUPABASE_URL)
+        } else {
+            debug('🟢 SUPABASE_URL is set')
+        }
+
+        if (SUPABASE_KEY.includes('YOUR-KEY')) {
+            debug('🔴 ERROR: You have not updated SUPABASE_KEY!')
+        } else if (!SUPABASE_KEY.startsWith('sb_publis_')) {
+            debug('🟡 WARNING: Key might be wrong format. Should start with sb_publis_')
+        } else {
+            debug('🟢 SUPABASE_KEY format looks correct')
+        }
+
+        // Wait for Supabase library
         function waitForSupabase(callback) {
             if (typeof window.supabase !== 'undefined') {
+                debug('🟢 Step 2: Supabase library loaded')
                 callback()
             } else {
+                debug('⏳ Waiting for Supabase library...')
                 setTimeout(() => waitForSupabase(callback), 500)
             }
         }
 
         waitForSupabase(function() {
+            debug('🟢 Step 3: Creating Supabase client...')
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+            debug('🟢 Step 4: Starting app...')
             startApp()
         })
 
         async function startApp() {
             try {
-                const { data: { user } } = await supabase.auth.getUser()
+                debug('🟢 Step 5: Checking user...')
+                const { data, error } = await supabase.auth.getUser()
+                
+                if (error) {
+                    debug('🔴 Auth error: ' + error.message)
+                    showLoginPage()
+                    return
+                }
 
-                if (user) {
-                    currentUser = user
+                if (data && data.user) {
+                    debug('🟢 User found: ' + data.user.email)
+                    currentUser = data.user
                     showDashboard()
                 } else {
+                    debug('🟢 No user logged in, showing login page')
                     showLoginPage()
                 }
             } catch (e) {
+                debug('🔴 Start error: ' + e.message)
                 showLoginPage()
             }
         }
 
-        // =============================================
-        // 📱 LOGIN PAGE
-        // =============================================
         function showLoginPage() {
+            debug('📱 Showing Login Page')
             app.innerHTML = `
                 <div class="container">
                     <div class="logo"><span>by</span> WEEM</div>
@@ -96,16 +134,20 @@
                         <div id="loginError" class="error"></div>
                         
                         <h2>Login</h2>
-                        <input type="email" id="loginEmail" placeholder="Email" value="">
-                        <input type="password" id="loginPassword" placeholder="Password" value="">
+                        <input type="email" id="loginEmail" placeholder="Email">
+                        <input type="password" id="loginPassword" placeholder="Password">
                         <button class="btn btn-blue" onclick="handleLogin()">Login</button>
                         
                         <div class="link">
                             No account? <a href="javascript:void(0)" onclick="showSignupPage()">Sign up here</a>
                         </div>
                     </div>
+                    <div id="debugInfo"></div>
                 </div>
             `
+            // Move debug info
+            const newDebug = document.getElementById('debugInfo')
+            newDebug.innerHTML = debugDiv.innerHTML
         }
 
         async function handleLogin() {
@@ -130,9 +172,6 @@
             }
         }
 
-        // =============================================
-        // 📝 SIGNUP PAGE
-        // =============================================
         function showSignupPage() {
             app.innerHTML = `
                 <div class="container">
@@ -142,9 +181,9 @@
                         <div id="signupError" class="error"></div>
                         
                         <h2>Sign Up</h2>
-                        <input type="text" id="signupUsername" placeholder="Username" value="">
-                        <input type="email" id="signupEmail" placeholder="Email" value="">
-                        <input type="password" id="signupPassword" placeholder="Password (6+ characters)" value="">
+                        <input type="text" id="signupUsername" placeholder="Username">
+                        <input type="email" id="signupEmail" placeholder="Email">
+                        <input type="password" id="signupPassword" placeholder="Password (6+ characters)">
                         <button class="btn btn-green" onclick="handleSignup()">Sign Up</button>
                         
                         <div class="link">
@@ -198,9 +237,6 @@
             }
         }
 
-        // =============================================
-        // 📋 DASHBOARD
-        // =============================================
         async function showDashboard() {
             const username = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'User'
             
@@ -237,7 +273,7 @@
                     
                     <div class="card">
                         <h3>Create New Post</h3>
-                        <input type="text" id="postTitle" placeholder="Post title" value="">
+                        <input type="text" id="postTitle" placeholder="Post title">
                         <textarea id="postContent" placeholder="What's on your mind?"></textarea>
                         <button class="btn btn-blue" onclick="createPost()">Publish</button>
                     </div>
@@ -266,9 +302,6 @@
             showDashboard()
         }
 
-        // =============================================
-        // 🌍 EXPLORE PAGE
-        // =============================================
         async function showExplore() {
             const { data: posts } = await supabase
                 .from('posts')
@@ -321,18 +354,12 @@
             `
         }
 
-        // =============================================
-        // 🚪 LOGOUT
-        // =============================================
         async function handleLogout() {
             await supabase.auth.signOut()
             currentUser = null
             showLoginPage()
         }
 
-        // =============================================
-        // 🛡️ HELPER
-        // =============================================
         function escapeText(text) {
             if (!text) return ''
             const div = document.createElement('div')
