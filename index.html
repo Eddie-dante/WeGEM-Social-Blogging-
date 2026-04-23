@@ -33,7 +33,7 @@
         .notice { background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #856404; font-size: 13px; }
         .author { color: #0066cc; font-weight: bold; margin-bottom: 8px; }
         .empty { text-align: center; padding: 30px; color: #999; }
-        #debugInfo { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #666; word-break: break-all; }
+        #debugInfo { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 11px; color: #666; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -45,14 +45,16 @@
         </div>
     </div>
 
+    <!-- Supabase from unpkg (backup CDN) -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
         // =============================================
         // 🔑 PUT YOUR ACTUAL KEYS HERE
         // =============================================
         const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
-        const SUPABASE_KEY = 'sb_publishable_Hgb_4yGVSkCSSkKf4bN1lQ_Ndsz1yD-'
+        const SUPABASE_KEY = 'sb_publishable_OnbXuVmC_wOD3fC3f2jo2A_u0Gjp6oi'
 
-        // Show debug info
         const debugDiv = document.getElementById('debugInfo')
         let supabase
         const app = document.getElementById('app')
@@ -65,89 +67,79 @@
 
         debug('🟢 Step 1: Script started')
 
-        // Check keys
         if (SUPABASE_URL.includes('YOUR-PROJECT')) {
-            debug('🔴 ERROR: You have not updated SUPABASE_URL!')
-            debug('Current URL: ' + SUPABASE_URL)
+            debug('🔴 ERROR: Update SUPABASE_URL!')
         } else {
-            debug('🟢 SUPABASE_URL is set')
+            debug('🟢 URL is set')
         }
 
         if (SUPABASE_KEY.includes('YOUR-KEY')) {
-            debug('🔴 ERROR: You have not updated SUPABASE_KEY!')
+            debug('🔴 ERROR: Update SUPABASE_KEY!')
         } else if (!SUPABASE_KEY.startsWith('sb_publis_')) {
-            debug('🟡 WARNING: Key might be wrong format. Should start with sb_publis_')
+            debug('🔴 WRONG KEY! Must start with: sb_publis_')
+            debug('Your key starts with: ' + SUPABASE_KEY.substring(0, 15) + '...')
         } else {
-            debug('🟢 SUPABASE_KEY format looks correct')
+            debug('🟢 Key format is correct')
         }
 
-        // Wait for Supabase library
-        function waitForSupabase(callback) {
+        // Try to load Supabase
+        let attempts = 0
+        function waitForSupabase() {
+            attempts++
             if (typeof window.supabase !== 'undefined') {
-                debug('🟢 Step 2: Supabase library loaded')
-                callback()
+                debug('🟢 Supabase loaded after ' + attempts + ' attempts')
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+                startApp()
+            } else if (attempts > 20) {
+                debug('🔴 FAILED: Supabase library not loading')
+                debug('Try using WiFi instead of mobile data')
+                debug('Or check if unpkg.com is blocked')
             } else {
-                debug('⏳ Waiting for Supabase library...')
-                setTimeout(() => waitForSupabase(callback), 500)
+                setTimeout(waitForSupabase, 500)
             }
         }
 
-        waitForSupabase(function() {
-            debug('🟢 Step 3: Creating Supabase client...')
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-            debug('🟢 Step 4: Starting app...')
-            startApp()
-        })
+        waitForSupabase()
 
         async function startApp() {
             try {
-                debug('🟢 Step 5: Checking user...')
+                debug('Checking user...')
                 const { data, error } = await supabase.auth.getUser()
                 
                 if (error) {
-                    debug('🔴 Auth error: ' + error.message)
+                    debug('Error: ' + error.message)
                     showLoginPage()
                     return
                 }
 
                 if (data && data.user) {
-                    debug('🟢 User found: ' + data.user.email)
                     currentUser = data.user
                     showDashboard()
                 } else {
-                    debug('🟢 No user logged in, showing login page')
                     showLoginPage()
                 }
             } catch (e) {
-                debug('🔴 Start error: ' + e.message)
+                debug('Error: ' + e.message)
                 showLoginPage()
             }
         }
 
         function showLoginPage() {
-            debug('📱 Showing Login Page')
             app.innerHTML = `
                 <div class="container">
                     <div class="logo"><span>by</span> WEEM</div>
-                    
                     <div class="card">
                         <div id="loginError" class="error"></div>
-                        
                         <h2>Login</h2>
                         <input type="email" id="loginEmail" placeholder="Email">
                         <input type="password" id="loginPassword" placeholder="Password">
                         <button class="btn btn-blue" onclick="handleLogin()">Login</button>
-                        
                         <div class="link">
                             No account? <a href="javascript:void(0)" onclick="showSignupPage()">Sign up here</a>
                         </div>
                     </div>
-                    <div id="debugInfo"></div>
                 </div>
             `
-            // Move debug info
-            const newDebug = document.getElementById('debugInfo')
-            newDebug.innerHTML = debugDiv.innerHTML
         }
 
         async function handleLogin() {
@@ -176,16 +168,13 @@
             app.innerHTML = `
                 <div class="container">
                     <div class="logo"><span>by</span> WEEM</div>
-                    
                     <div class="card">
                         <div id="signupError" class="error"></div>
-                        
                         <h2>Sign Up</h2>
                         <input type="text" id="signupUsername" placeholder="Username">
                         <input type="email" id="signupEmail" placeholder="Email">
                         <input type="password" id="signupPassword" placeholder="Password (6+ characters)">
                         <button class="btn btn-green" onclick="handleSignup()">Sign Up</button>
-                        
                         <div class="link">
                             Already have an account? <a href="javascript:void(0)" onclick="showLoginPage()">Login</a>
                         </div>
@@ -228,9 +217,7 @@
                         username: username,
                         email: email
                     })
-                } catch (e) {
-                    console.log("Profile note:", e)
-                }
+                } catch (e) {}
                 
                 currentUser = data.user
                 showDashboard()
