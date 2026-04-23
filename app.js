@@ -1,213 +1,266 @@
-// Supabase Config - REPLACE WITH YOURS
+// =============================================
+// 🔑 REPLACE THESE WITH YOUR SUPABASE DETAILS
+// =============================================
 const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_Hgb_4yGVSkCSSkKf4bN1lQ_Ndsz1yD-'
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+// Create Supabase client
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const app = document.getElementById('app')
 let currentUser = null
 
-// Check if user is logged in
-async function init() {
-    const { data: { user } } = await supabase.auth.getUser()
-    currentUser = user
+// =============================================
+// 🚀 START THE APP
+// =============================================
+async function startApp() {
+    const { data: { user }, error } = await supabase.auth.getUser()
     
     if (user) {
+        currentUser = user
         showDashboard()
     } else {
-        showLogin()
+        showLoginPage()
     }
 }
 
-// ============ LOGIN PAGE ============
-function showLogin() {
+// =============================================
+// 📱 LOGIN PAGE (From your flowchart)
+// =============================================
+function showLoginPage() {
     app.innerHTML = `
         <div class="container">
-            <div class="logo">by WEEM</div>
+            <div class="logo"><span>by</span> WEEM</div>
+            
             <div class="card">
-                <div class="tabs">
-                    <div class="tab active" onclick="showLogin()">Login</div>
-                    <div class="tab" onclick="showSignup()">Sign Up</div>
-                </div>
-                <h2>Welcome Back</h2>
-                <div id="error" class="error"></div>
-                <form onsubmit="login(event)">
-                    <input type="email" id="email" placeholder="Email" required>
-                    <input type="password" id="password" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                </form>
-            </div>
-        </div>
-    `
-}
-
-async function login(e) {
-    e.preventDefault()
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
-    
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    
-    if (error) {
-        document.getElementById('error').textContent = error.message
-    } else {
-        init()
-    }
-}
-
-// ============ SIGNUP PAGE ============
-function showSignup() {
-    app.innerHTML = `
-        <div class="container">
-            <div class="logo">by WEEM</div>
-            <div class="card">
-                <div class="tabs">
-                    <div class="tab" onclick="showLogin()">Login</div>
-                    <div class="tab active" onclick="showSignup()">Sign Up</div>
-                </div>
-                <h2>Create Account</h2>
-                <div id="error" class="error"></div>
-                <form onsubmit="signup(event)">
-                    <input type="text" id="username" placeholder="Username" required>
-                    <input type="email" id="email" placeholder="Email" required>
-                    <input type="password" id="password" placeholder="Password (min 6 chars)" required>
-                    <button type="submit" class="secondary">Sign Up</button>
-                </form>
+                <div id="loginError" class="error"></div>
+                
+                <h2>Login</h2>
+                <input type="email" id="loginEmail" placeholder="Email">
+                <input type="password" id="loginPassword" placeholder="Password">
+                <button class="btn btn-blue" onclick="handleLogin()">Login</button>
+                
                 <div class="link">
-                    <a href="#" onclick="showLogin()">Already have an account? Login</a>
+                    No account? <a href="#" onclick="showSignupPage()">Sign up here</a>
                 </div>
             </div>
         </div>
     `
 }
 
-async function signup(e) {
-    e.preventDefault()
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
-    const username = document.getElementById('username').value
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value
+    const password = document.getElementById('loginPassword').value
+    const errorDiv = document.getElementById('loginError')
     
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { username } }
+    if (!email || !password) {
+        errorDiv.textContent = 'Please fill in all fields'
+        errorDiv.style.display = 'block'
+        return
+    }
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
     })
     
     if (error) {
-        document.getElementById('error').textContent = error.message
+        errorDiv.textContent = error.message
+        errorDiv.style.display = 'block'
     } else {
-        // Create profile
-        await supabase.from('profiles').insert([
-            { id: data.user.id, username, email }
-        ])
-        init()
+        currentUser = data.user
+        showDashboard()
     }
 }
 
-// ============ DASHBOARD (Personal Blog Page) ============
+// =============================================
+// 📝 SIGNUP PAGE (From your flowchart)
+// =============================================
+function showSignupPage() {
+    app.innerHTML = `
+        <div class="container">
+            <div class="logo"><span>by</span> WEEM</div>
+            
+            <div class="card">
+                <div id="signupError" class="error"></div>
+                
+                <h2>Sign Up</h2>
+                <input type="text" id="signupUsername" placeholder="Username">
+                <input type="email" id="signupEmail" placeholder="Email">
+                <input type="password" id="signupPassword" placeholder="Password (6+ characters)">
+                <button class="btn btn-green" onclick="handleSignup()">Sign Up</button>
+                
+                <div class="link">
+                    Already have an account? <a href="#" onclick="showLoginPage()">Login</a>
+                </div>
+            </div>
+        </div>
+    `
+}
+
+async function handleSignup() {
+    const username = document.getElementById('signupUsername').value
+    const email = document.getElementById('signupEmail').value
+    const password = document.getElementById('signupPassword').value
+    const errorDiv = document.getElementById('signupError')
+    
+    if (!username || !email || !password) {
+        errorDiv.textContent = 'Please fill in all fields'
+        errorDiv.style.display = 'block'
+        return
+    }
+    
+    if (password.length < 6) {
+        errorDiv.textContent = 'Password must be at least 6 characters'
+        errorDiv.style.display = 'block'
+        return
+    }
+    
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: { username: username }
+        }
+    })
+    
+    if (error) {
+        errorDiv.textContent = error.message
+        errorDiv.style.display = 'block'
+    } else {
+        // Create profile in profiles table
+        await supabase.from('profiles').insert({
+            id: data.user.id,
+            username: username,
+            email: email
+        })
+        
+        currentUser = data.user
+        showDashboard()
+    }
+}
+
+// =============================================
+// 📋 DASHBOARD - Personal Blog Page
+// =============================================
 async function showDashboard() {
+    const username = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'User'
+    
+    // Fetch user's posts
     const { data: posts } = await supabase
         .from('posts')
         .select('*')
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false })
     
-    const username = currentUser.user_metadata?.username || currentUser.email
-    
     let postsHTML = ''
     if (posts && posts.length > 0) {
         posts.forEach(post => {
             postsHTML += `
                 <div class="post">
-                    <h3>${escapeHtml(post.title)}</h3>
-                    <p>${escapeHtml(post.content)}</p>
-                    <small>${new Date(post.created_at).toLocaleString()}</small>
+                    <h3>${escapeText(post.title)}</h3>
+                    <p>${escapeText(post.content)}</p>
+                    <small>${new Date(post.created_at).toLocaleDateString()}</small>
                 </div>
             `
         })
     } else {
-        postsHTML = '<p style="text-align:center; color:#999; padding:40px;">📝 No posts yet. Create one below!</p>'
+        postsHTML = '<div class="empty">📝 No posts yet. Create your first one below!</div>'
     }
     
     app.innerHTML = `
         <div class="container">
             <div class="header">
-                <h1><span style="color:#0066cc;">by WEEM</span> | ${escapeHtml(username)}</h1>
+                <h1><span style="color:#0066cc;">by WEEM</span> | ${escapeText(username)}</h1>
                 <div class="btn-group">
-                    <button onclick="showExplore()" style="background:#28a745;">🌍 Other</button>
-                    <button onclick="logout()" class="danger" style="background:#666;">Quit</button>
+                    <button class="btn-sm btn-green" onclick="showExplore()">🌍 Other</button>
+                    <button class="btn-sm btn-gray" onclick="handleLogout()">Quit</button>
                 </div>
             </div>
             
             <div class="card">
-                <h3>Create Post</h3>
-                <form onsubmit="createPost(event)">
-                    <input type="text" id="title" placeholder="Title" required>
-                    <textarea id="content" placeholder="What's on your mind?" rows="3" required></textarea>
-                    <button type="submit">Publish</button>
-                </form>
+                <h3>Create New Post</h3>
+                <input type="text" id="postTitle" placeholder="Post title">
+                <textarea id="postContent" placeholder="What's on your mind?"></textarea>
+                <button class="btn btn-blue" onclick="createPost()">Publish</button>
             </div>
             
-            <h3 style="margin:20px 0 10px;">Your Posts</h3>
+            <h3 style="margin: 20px 0 10px;">Your Posts</h3>
             ${postsHTML}
         </div>
     `
 }
 
-async function createPost(e) {
-    e.preventDefault()
-    const title = document.getElementById('title').value
-    const content = document.getElementById('content').value
+async function createPost() {
+    const title = document.getElementById('postTitle').value
+    const content = document.getElementById('postContent').value
     
-    await supabase.from('posts').insert([
-        { user_id: currentUser.id, title, content }
-    ])
+    if (!title || !content) {
+        alert('Please fill in both title and content')
+        return
+    }
+    
+    await supabase.from('posts').insert({
+        user_id: currentUser.id,
+        title: title,
+        content: content
+    })
     
     showDashboard()
 }
 
-// ============ EXPLORE PAGE (The "OTHER BUTTON") ============
+// =============================================
+// 🌍 EXPLORE PAGE - The "OTHER BUTTON"
+// =============================================
 async function showExplore() {
     const { data: posts } = await supabase
         .from('posts')
-        .select(`
-            *,
-            profiles:user_id(username)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(50)
+    
+    // Get all profiles for usernames
+    const { data: profiles } = await supabase
+        .from('profiles')
+        .select('*')
+    
+    const profileMap = {}
+    if (profiles) {
+        profiles.forEach(p => {
+            profileMap[p.id] = p.username
+        })
+    }
     
     let postsHTML = ''
     if (posts && posts.length > 0) {
         posts.forEach(post => {
-            const author = post.profiles?.username || 'anonymous'
+            const authorName = profileMap[post.user_id] || 'anonymous'
+            const isOwnPost = post.user_id === currentUser.id
+            
             postsHTML += `
                 <div class="post">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <strong style="color:#0066cc;">@${escapeHtml(author)}</strong>
-                        ${author !== currentUser.user_metadata?.username ? 
-                            '<button onclick="sendFriendRequest(\'' + post.user_id + '\')" style="background:#28a745; padding:5px 12px; border:none; border-radius:20px; color:white; cursor:pointer; font-size:12px;">👋 Add Friend</button>' 
-                            : ''}
-                    </div>
-                    <h3>${escapeHtml(post.title)}</h3>
-                    <p>${escapeHtml(post.content)}</p>
-                    <small>${new Date(post.created_at).toLocaleString()}</small>
+                    <div class="author">@${escapeText(authorName)}</div>
+                    <h3>${escapeText(post.title)}</h3>
+                    <p>${escapeText(post.content)}</p>
+                    <small>${new Date(post.created_at).toLocaleDateString()}</small>
+                    ${!isOwnPost ? '<button class="btn-sm btn-green" style="margin-top:10px;" onclick="alert(\'Friend request sent!\')">👋 Add Friend</button>' : ''}
                 </div>
             `
         })
     } else {
-        postsHTML = '<p style="text-align:center; color:#999; padding:40px;">🌱 No posts yet.</p>'
+        postsHTML = '<div class="empty">🌱 No posts yet. Be the first!</div>'
     }
     
     app.innerHTML = `
         <div class="container">
             <div class="header">
                 <h1><span style="color:#0066cc;">by WEEM</span> | 🌍 Explore</h1>
-                <button onclick="showDashboard()" style="background:#666; padding:10px 16px; border:none; border-radius:8px; color:white; cursor:pointer;">← Back</button>
+                <button class="btn-sm btn-gray" onclick="showDashboard()">← Back</button>
             </div>
             
-            <div style="background:#fff3cd; padding:15px; border-radius:8px; margin-bottom:20px; color:#856404;">
-                <strong>👀 Read-Only:</strong> You can see everyone's blogs but cannot edit them.
+            <div class="notice">
+                👀 <strong>Read-Only:</strong> You can see everyone's blogs but cannot edit them.
+                Send a friend request to chat!
             </div>
             
             ${postsHTML}
@@ -215,24 +268,26 @@ async function showExplore() {
     `
 }
 
-function sendFriendRequest(userId) {
-    alert('📨 Friend request sent! (Phase 3 - Coming soon)')
-    // Phase 3: Actually store friend request in Supabase
-}
-
-// ============ LOGOUT ============
-async function logout() {
+// =============================================
+// 🚪 LOGOUT (QUIT BUTTON)
+// =============================================
+async function handleLogout() {
     await supabase.auth.signOut()
     currentUser = null
-    showLogin()
+    showLoginPage()
 }
 
-// Helper function
-function escapeHtml(text) {
+// =============================================
+// 🛡️ HELPER FUNCTION
+// =============================================
+function escapeText(text) {
+    if (!text) return ''
     const div = document.createElement('div')
     div.textContent = text
     return div.innerHTML
 }
 
-// Start the app
-init()
+// =============================================
+// 🚀 START!
+// =============================================
+startApp()
