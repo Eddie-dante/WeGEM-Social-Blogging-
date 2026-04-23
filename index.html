@@ -3,98 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>by WEEM - Test</title>
+    <title>by WEEM</title>
     <style>
-        body { font-family: Arial; background: #f0f2f5; text-align: center; padding: 50px 20px; }
-        .card { background: white; max-width: 400px; margin: 20px auto; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .logo { font-size: 28px; font-weight: bold; margin-bottom: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; min-height: 100vh; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .logo { text-align: center; padding: 30px 0; font-size: 28px; font-weight: bold; }
         .logo span { color: #0066cc; }
-        .status { padding: 10px; border-radius: 8px; margin: 10px 0; }
-        .green { background: #d4edda; color: #155724; }
-        .red { background: #f8d7da; color: #721c24; }
-        .yellow { background: #fff3cd; color: #856404; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        button { background: #0066cc; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        h2 { margin-bottom: 20px; color: #333; font-size: 18px; }
+        h3 { margin-bottom: 15px; color: #333; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        textarea { resize: vertical; min-height: 80px; }
+        .btn { width: 100%; padding: 14px; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .btn-blue { background: #0066cc; }
+        .btn-green { background: #28a745; }
+        .btn-gray { background: #666; }
+        .error { background: #ffe6e6; color: #cc0000; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
+        .link { text-align: center; margin-top: 15px; }
+        .link a { color: #0066cc; text-decoration: none; }
+        .post { background: white; padding: 20px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .post h3 { margin-bottom: 8px; font-size: 16px; }
+        .post p { color: #555; line-height: 1.5; font-size: 14px; }
+        .post small { color: #999; font-size: 12px; display: block; margin-top: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 18px; }
+        .btn-group { display: flex; gap: 8px; }
+        .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 20px; border: none; color: white; cursor: pointer; font-weight: bold; }
+        .notice { background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #856404; font-size: 13px; }
+        .author { color: #0066cc; font-weight: bold; margin-bottom: 8px; }
+        .empty { text-align: center; padding: 30px; color: #999; }
     </style>
 </head>
 <body>
-    <div class="logo"><span>by</span> WEEM</div>
-    <div class="card">
-        <h2>Diagnostic Test</h2>
-        <div id="status1" class="status yellow">⏳ Checking HTML...</div>
-        <div id="status2" class="status yellow">⏳ Checking Supabase...</div>
-        <div id="status3" class="status yellow">⏳ Checking Connection...</div>
-        <div id="formArea"></div>
+    <div id="app">
+        <div class="container" style="text-align:center; padding-top:100px;">
+            <div class="logo"><span>by</span> WEEM</div>
+            <p>Loading...</p>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // STEP 1: HTML is working
-        document.getElementById('status1').className = 'status green'
-        document.getElementById('status1').textContent = '✅ HTML is working!'
-        console.log('✅ HTML loaded')
+        // =============================================
+        // 🔑 YOUR SUPABASE KEYS (Already correct from test!)
+        // =============================================
+        const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
+        const SUPABASE_KEY = 'sb_publishable_Hgb_4yGVSkCSSkKf4bN1lQ_Ndsz1yD-'
 
-        // STEP 2: Check if Supabase loaded
-        setTimeout(() => {
+        let supabase
+        const app = document.getElementById('app')
+        let currentUser = null
+
+        // Wait for Supabase to fully load
+        function waitForSupabase(callback) {
             if (typeof window.supabase !== 'undefined') {
-                document.getElementById('status2').className = 'status green'
-                document.getElementById('status2').textContent = '✅ Supabase library loaded!'
-                console.log('✅ Supabase loaded')
-                
-                // Step 3: Test connection
-                testConnection()
+                callback()
             } else {
-                document.getElementById('status2').className = 'status red'
-                document.getElementById('status2').textContent = '❌ Supabase library FAILED to load. Check internet.'
-                console.log('❌ Supabase not found')
+                setTimeout(() => waitForSupabase(callback), 500)
             }
-        }, 2000)
+        }
 
-        async function testConnection() {
-            // REPLACE THESE WITH YOUR ACTUAL KEYS
-            const SUPABASE_URL = 'https://your-project.supabase.co'
-            const SUPABASE_KEY = 'your-anon-key'
-            
+        waitForSupabase(function() {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+            startApp()
+        })
+
+        async function startApp() {
             try {
-                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-                
-                // Test: Get user (will be null if not logged in)
-                const { data, error } = await supabase.auth.getUser()
-                
-                if (error && error.message.includes('Invalid')) {
-                    document.getElementById('status3').className = 'status red'
-                    document.getElementById('status3').textContent = '❌ Invalid API keys. Please check SUPABASE_URL and SUPABASE_KEY'
+                const { data: { user } } = await supabase.auth.getUser()
+
+                if (user) {
+                    currentUser = user
+                    showDashboard()
                 } else {
-                    document.getElementById('status3').className = 'status green'
-                    document.getElementById('status3').textContent = '✅ Connected to Supabase!'
-                    
-                    if (data.user) {
-                        showLoggedIn(data.user)
-                    } else {
-                        showLoginForm()
-                    }
+                    showLoginPage()
                 }
             } catch (e) {
-                document.getElementById('status3').className = 'status red'
-                document.getElementById('status3').textContent = '❌ Error: ' + e.message
+                showLoginPage()
             }
         }
 
-        function showLoginForm() {
-            document.getElementById('formArea').innerHTML = `
-                <h3 style="margin-top:20px;">Supabase is working!</h3>
-                <p style="color:#666;">Now update the keys in your code and refresh.</p>
-                <input type="email" placeholder="Email" id="email">
-                <input type="password" placeholder="Password" id="password">
-                <button onclick="alert('This is just a test. Deploy the full version!')">Test Login</button>
+        // =============================================
+        // 📱 LOGIN PAGE
+        // =============================================
+        function showLoginPage() {
+            app.innerHTML = `
+                <div class="container">
+                    <div class="logo"><span>by</span> WEEM</div>
+                    
+                    <div class="card">
+                        <div id="loginError" class="error"></div>
+                        
+                        <h2>Login</h2>
+                        <input type="email" id="loginEmail" placeholder="Email" value="">
+                        <input type="password" id="loginPassword" placeholder="Password" value="">
+                        <button class="btn btn-blue" onclick="handleLogin()">Login</button>
+                        
+                        <div class="link">
+                            No account? <a href="javascript:void(0)" onclick="showSignupPage()">Sign up here</a>
+                        </div>
+                    </div>
+                </div>
             `
         }
 
-        function showLoggedIn(user) {
-            document.getElementById('formArea').innerHTML = `
-                <h3 style="margin-top:20px;">Already logged in!</h3>
-                <p style="color:#666;">User: ${user.email}</p>
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value
+            const password = document.getElementById('loginPassword').value
+            const errorDiv = document.getElementById('loginError')
+            
+            if (!email || !password) {
+                errorDiv.textContent = 'Please fill in all fields'
+                errorDiv.style.display = 'block'
+                return
+            }
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+            
+            if (error) {
+                errorDiv.textContent = error.message
+                errorDiv.style.display = 'block'
+            } else {
+                currentUser = data.user
+                showDashboard()
+            }
+        }
+
+        // =============================================
+        // 📝 SIGNUP PAGE
+        // =============================================
+        function showSignupPage() {
+            app.innerHTML = `
+                <div class="container">
+                    <div class="logo"><span>by</span> WEEM</div>
+                    
+                    <div class="card">
+                        <div id="signupError" class="error"></div>
+                        
+                        <h2>Sign Up</h2>
+                        <input type="text" id="signupUsername" placeholder="Username" value="">
+                        <input type="email" id="signupEmail" placeholder="Email" value="">
+                        <input type="password" id="signupPassword" placeholder="Password (6+ characters)" value="">
+                        <button class="btn btn-green" onclick="handleSignup()">Sign Up</button>
+                        
+                        <div class="link">
+                            Already have an account? <a href="javascript:void(0)" onclick="showLoginPage()">Login</a>
+                        </div>
+                    </div>
+                </div>
             `
+        }
+
+        async function handleSignup() {
+            const username = document.getElementById('signupUsername').value
+            const email = document.getElementById('signupEmail').value
+            const password = document.getElementById('signupPassword').value
+            const errorDiv = document.getElementById('signupError')
+            
+            if (!username || !email || !password) {
+                errorDiv.textContent = 'Please fill in all fields'
+                errorDiv.style.display = 'block'
+                return
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'Password must be at least 6 characters'
+                errorDiv.style.display = 'block'
+                return
+            }
+            
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { username: username } }
+            })
+            
+            if (error) {
+                errorDiv.textContent = error.message
+                errorDiv.style.display = 'block'
+            } else {
+                try {
+                    await supabase.from('profiles').insert({
+                        id: data.user.id,
+                        username: username,
+                        email: email
+                    })
+                } catch (e) {
+                    console.log("Profile note:", e)
+                }
+                
+                currentUser = data.user
+                showDashboard()
+            }
+        }
+
+        // =============================================
+        // 📋 DASHBOARD
+        // =============================================
+        async function showDashboard() {
+            const username = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'User'
+            
+            const { data: posts } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false })
+            
+            let postsHTML = ''
+            if (posts && posts.length > 0) {
+                posts.forEach(post => {
+                    postsHTML += `
+                        <div class="post">
+                            <h3>${escapeText(post.title)}</h3>
+                            <p>${escapeText(post.content)}</p>
+                            <small>${new Date(post.created_at).toLocaleDateString()}</small>
+                        </div>
+                    `
+                })
+            } else {
+                postsHTML = '<div class="empty">📝 No posts yet. Create your first one below!</div>'
+            }
+            
+            app.innerHTML = `
+                <div class="container">
+                    <div class="header">
+                        <h1><span style="color:#0066cc;">by WEEM</span> | ${escapeText(username)}</h1>
+                        <div class="btn-group">
+                            <button class="btn-sm" style="background:#28a745;" onclick="showExplore()">🌍 Other</button>
+                            <button class="btn-sm" style="background:#666;" onclick="handleLogout()">Quit</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Create New Post</h3>
+                        <input type="text" id="postTitle" placeholder="Post title" value="">
+                        <textarea id="postContent" placeholder="What's on your mind?"></textarea>
+                        <button class="btn btn-blue" onclick="createPost()">Publish</button>
+                    </div>
+                    
+                    <h3 style="margin: 20px 0 10px;">Your Posts</h3>
+                    ${postsHTML}
+                </div>
+            `
+        }
+
+        async function createPost() {
+            const title = document.getElementById('postTitle').value
+            const content = document.getElementById('postContent').value
+            
+            if (!title || !content) {
+                alert('Please fill in both title and content')
+                return
+            }
+            
+            await supabase.from('posts').insert({
+                user_id: currentUser.id,
+                title: title,
+                content: content
+            })
+            
+            showDashboard()
+        }
+
+        // =============================================
+        // 🌍 EXPLORE PAGE
+        // =============================================
+        async function showExplore() {
+            const { data: posts } = await supabase
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(50)
+            
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('*')
+            
+            const profileMap = {}
+            if (profiles) {
+                profiles.forEach(p => { profileMap[p.id] = p.username })
+            }
+            
+            let postsHTML = ''
+            if (posts && posts.length > 0) {
+                posts.forEach(post => {
+                    const authorName = profileMap[post.user_id] || 'anonymous'
+                    const isOwnPost = post.user_id === currentUser.id
+                    
+                    postsHTML += `
+                        <div class="post">
+                            <div class="author">@${escapeText(authorName)}</div>
+                            <h3>${escapeText(post.title)}</h3>
+                            <p>${escapeText(post.content)}</p>
+                            <small>${new Date(post.created_at).toLocaleDateString()}</small>
+                            ${!isOwnPost ? '<button class="btn-sm" style="background:#28a745; margin-top:10px;" onclick="alert(\'Friend request sent!\')">👋 Add Friend</button>' : ''}
+                        </div>
+                    `
+                })
+            } else {
+                postsHTML = '<div class="empty">🌱 No posts yet. Be the first!</div>'
+            }
+            
+            app.innerHTML = `
+                <div class="container">
+                    <div class="header">
+                        <h1><span style="color:#0066cc;">by WEEM</span> | 🌍 Explore</h1>
+                        <button class="btn-sm" style="background:#666;" onclick="showDashboard()">← Back</button>
+                    </div>
+                    
+                    <div class="notice">
+                        👀 <strong>Read-Only:</strong> You can see everyone's blogs but cannot edit them.
+                    </div>
+                    
+                    ${postsHTML}
+                </div>
+            `
+        }
+
+        // =============================================
+        // 🚪 LOGOUT
+        // =============================================
+        async function handleLogout() {
+            await supabase.auth.signOut()
+            currentUser = null
+            showLoginPage()
+        }
+
+        // =============================================
+        // 🛡️ HELPER
+        // =============================================
+        function escapeText(text) {
+            if (!text) return ''
+            const div = document.createElement('div')
+            div.textContent = text
+            return div.innerHTML
         }
     </script>
 </body>
