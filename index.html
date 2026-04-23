@@ -17,67 +17,69 @@ button { padding:12px; border:none; border-radius:8px; color:#fff; cursor:pointe
 .post { background:#fff; padding:15px; border-radius:10px; margin-bottom:10px; }
 .small { font-size:12px; color:#999; }
 .header { display:flex; justify-content:space-between; align-items:center; }
+.loader { text-align:center; padding:40px; color:#666; }
 </style>
 
 </head>
 <body>
 
-<div id="app">Loading...</div>
+<div id="app"></div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
-// ================= SAFE START =================
-window.onerror = function(msg, url, line) {
-  alert("ERROR: " + msg + " (line " + line + ")");
-};
-
-// ================= CONFIG =================
 const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_OnbXuVmC_wOD3fC3f2jo2A_u0Gjp6oi'
 
-// ================= GLOBALS =================
-let supabase = null
-let currentUser = null
 const app = document.getElementById('app')
 
-// ================= WAIT FOR SUPABASE =================
-function waitForSupabase() {
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-        init()
-    } else {
-        setTimeout(waitForSupabase, 200)
-    }
-}
-waitForSupabase()
+let supabase = null
+let currentUser = null
 
-// ================= INIT =================
-async function init() {
+// 🚀 INSTANT UI (no waiting)
+loginPage()
+
+// ⏱ Load Supabase in background
+initSupabase()
+
+async function initSupabase() {
+    let tries = 0
+
+    while (!window.supabase && tries < 20) {
+        await new Promise(r => setTimeout(r, 200))
+        tries++
+    }
+
+    if (!window.supabase) {
+        showError("No internet or CDN blocked")
+        return
+    }
+
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
     try {
         const { data } = await supabase.auth.getUser()
-
         if (data?.user) {
             currentUser = data.user
             dashboard()
-        } else {
-            loginPage()
         }
     } catch (e) {
-        alert("Init error: " + e.message)
-        loginPage()
+        console.log(e)
     }
 }
 
-// ================= AUTH =================
+// ================= UI =================
+
 function loginPage() {
     app.innerHTML = `
     <div class="container">
-        <h2>Login</h2>
-        <input id="email" placeholder="Email">
-        <input id="password" type="password" placeholder="Password">
-        <button class="blue" onclick="login()">Login</button>
-        <p>No account? <a href="#" onclick="signupPage()">Signup</a></p>
+        <h2>WEEM</h2>
+        <div class="card">
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+            <button class="blue" onclick="login()">Login</button>
+            <p>No account? <a href="#" onclick="signupPage()">Signup</a></p>
+        </div>
     </div>`
 }
 
@@ -85,19 +87,27 @@ function signupPage() {
     app.innerHTML = `
     <div class="container">
         <h2>Signup</h2>
-        <input id="username" placeholder="Username">
-        <input id="email" placeholder="Email">
-        <input id="password" type="password" placeholder="Password">
-        <button class="green" onclick="signup()">Signup</button>
-        <p><a href="#" onclick="loginPage()">Back to login</a></p>
+        <div class="card">
+            <input id="username" placeholder="Username">
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+            <button class="green" onclick="signup()">Signup</button>
+            <p><a href="#" onclick="loginPage()">Back</a></p>
+        </div>
     </div>`
 }
 
-async function login() {
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
+function showError(msg) {
+    app.innerHTML = `<div class="loader">⚠️ ${msg}</div>`
+}
 
-    if (!email || !password) return alert("Fill all fields")
+// ================= AUTH =================
+
+async function login() {
+    if (!supabase) return alert("Still connecting...")
+
+    const email = emailEl().value
+    const password = passwordEl().value
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
@@ -108,11 +118,11 @@ async function login() {
 }
 
 async function signup() {
-    const username = document.getElementById('username').value
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
+    if (!supabase) return alert("Still connecting...")
 
-    if (!username || !email || !password) return alert("Fill all fields")
+    const username = document.getElementById('username').value
+    const email = emailEl().value
+    const password = passwordEl().value
 
     const { data, error } = await supabase.auth.signUp({
         email,
@@ -122,7 +132,6 @@ async function signup() {
 
     if (error) return alert(error.message)
 
-    // Save profile (safe)
     if (data?.user) {
         await supabase.from('profiles').insert({
             id: data.user.id,
@@ -131,9 +140,6 @@ async function signup() {
         })
         currentUser = data.user
         dashboard()
-    } else {
-        alert("Check your email to confirm signup")
-        loginPage()
     }
 }
 
@@ -144,39 +150,30 @@ async function logout() {
 }
 
 // ================= DASHBOARD =================
-async function dashboard() {
-    const username = currentUser.user_metadata?.username || currentUser.email
 
-    const { data: posts, error } = await supabase
+async function dashboard() {
+    app.innerHTML = `<div class="loader">Loading feed...</div>`
+
+    const { data: posts } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false })
 
-    if (error) {
-        alert("DB error: " + error.message)
-        return
-    }
+    let html = ''
 
-    let htmlPosts = ''
-
-    if (posts?.length) {
-        posts.forEach(p => {
-            htmlPosts += `
-            <div class="post">
-                <b>${escapeHTML(p.title)}</b>
-                <p>${escapeHTML(p.content)}</p>
-                <div class="small">${new Date(p.created_at).toLocaleString()}</div>
-            </div>`
-        })
-    } else {
-        htmlPosts = `<p>No posts yet</p>`
-    }
+    posts?.forEach(p => {
+        html += `
+        <div class="post">
+            <b>${safe(p.title)}</b>
+            <p>${safe(p.content)}</p>
+            <div class="small">${new Date(p.created_at).toLocaleString()}</div>
+        </div>`
+    })
 
     app.innerHTML = `
     <div class="container">
-
         <div class="header">
-            <h3>${escapeHTML(username)}</h3>
+            <h3>${safe(currentUser.email)}</h3>
             <button class="gray" onclick="logout()">Logout</button>
         </div>
 
@@ -186,37 +183,36 @@ async function dashboard() {
             <button class="blue" onclick="createPost()">Post</button>
         </div>
 
-        ${htmlPosts}
-
+        ${html || '<p>No posts yet</p>'}
     </div>`
 }
 
 // ================= POSTS =================
+
 async function createPost() {
     const title = document.getElementById('title').value
     const content = document.getElementById('content').value
 
-    if (!title || !content) return alert('Fill everything')
+    if (!title || !content) return alert("Fill all fields")
 
-    const { error } = await supabase.from('posts').insert({
+    await supabase.from('posts').insert({
         user_id: currentUser.id,
         title,
         content
     })
 
-    if (error) {
-        alert("Post error: " + error.message)
-        return
-    }
-
     dashboard()
 }
 
-// ================= UTIL =================
-function escapeHTML(text) {
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
+// ================= HELPERS =================
+
+function emailEl(){ return document.getElementById('email') }
+function passwordEl(){ return document.getElementById('password') }
+
+function safe(t){
+    const d = document.createElement('div')
+    d.textContent = t
+    return d.innerHTML
 }
 </script>
 
