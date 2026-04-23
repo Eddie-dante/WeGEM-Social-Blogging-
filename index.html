@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WEEM - Social Network</title>
+<title>WEEM</title>
 
 <style>
 :root {
   --primary: #1877f2;
   --primary-hover: #166fe5;
   --secondary: #42b72a;
-  --secondary-hover: #36a420;
   --bg: #f0f2f5;
   --surface: #ffffff;
   --text-primary: #1c1e21;
@@ -19,8 +18,9 @@
   --hover-bg: #f2f2f2;
   --shadow: 0 1px 2px rgba(0,0,0,0.1);
   --shadow-lg: 0 2px 12px rgba(0,0,0,0.15);
-  --radius: 8px;
-  --radius-lg: 12px;
+  --radius: max(0.5vw, 8px);
+  --radius-lg: max(0.8vw, 12px);
+  --navbar-height: 56px;
 }
 
 * {
@@ -34,75 +34,84 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Header / Navbar */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Navbar */
 .navbar {
   background: var(--surface);
   box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 0 16px;
+  padding: 0 clamp(8px, 2vw, 16px);
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
-  gap: 8px;
+  height: var(--navbar-height);
+  gap: clamp(4px, 1vw, 8px);
 }
 
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(4px, 1vw, 8px);
+  flex-shrink: 0;
 }
 
 .logo {
-  font-size: 28px;
+  font-size: clamp(22px, 3vw, 28px);
   font-weight: 800;
   color: var(--primary);
   letter-spacing: -1px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .search-bar {
   background: var(--bg);
   border-radius: 50px;
-  padding: 8px 16px;
+  padding: clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 16px);
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 240px;
 }
 
 .search-bar input {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 14px;
-  width: 100%;
+  font-size: clamp(13px, 1.5vw, 14px);
+  width: clamp(100px, 15vw, 240px);
 }
 
 .nav-center {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: clamp(1px, 0.5vw, 4px);
+  flex-shrink: 0;
 }
 
 .nav-icon {
-  width: 48px;
-  height: 48px;
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   cursor: pointer;
   color: var(--text-secondary);
-  font-size: 20px;
+  font-size: clamp(18px, 2.5vw, 22px);
   position: relative;
   transition: all 0.2s;
   background: none;
@@ -126,31 +135,16 @@ body {
   border-radius: 4px 4px 0 0;
 }
 
-.badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #e41e3f;
-  color: white;
-  font-size: 11px;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(4px, 1vw, 8px);
+  flex-shrink: 0;
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: clamp(32px, 4vw, 40px);
+  height: clamp(32px, 4vw, 40px);
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -158,178 +152,159 @@ body {
   justify-content: center;
   font-weight: bold;
   color: white;
-  font-size: 18px;
-  position: relative;
+  font-size: clamp(14px, 1.8vw, 18px);
 }
 
 .user-avatar.sm {
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
+  width: clamp(28px, 3.5vw, 32px);
+  height: clamp(28px, 3.5vw, 32px);
+  font-size: clamp(12px, 1.5vw, 14px);
 }
 
 .user-avatar.lg {
-  width: 168px;
-  height: 168px;
-  font-size: 64px;
-}
-
-.online-dot {
-  width: 10px;
-  height: 10px;
-  background: #31a24c;
-  border-radius: 50%;
-  border: 2px solid white;
-  position: absolute;
-  bottom: 0;
-  right: 0;
+  width: clamp(100px, 15vw, 168px);
+  height: clamp(100px, 15vw, 168px);
+  font-size: clamp(32px, 5vw, 64px);
 }
 
 /* Main Layout */
 .main-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 16px;
+  padding: clamp(8px, 1.5vw, 16px);
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  gap: 16px;
-  min-height: calc(100vh - 56px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr) minmax(0, 1fr);
+  gap: clamp(8px, 1.5vw, 16px);
+  min-height: calc(100vh - var(--navbar-height));
 }
 
-@media (max-width: 1024px) {
+/* Tablet */
+@media (max-width: 1100px) {
+  .main-container {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  }
+  .sidebar-right {
+    display: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
   .main-container {
     grid-template-columns: 1fr;
-    max-width: 680px;
+    padding: 8px;
   }
-  .sidebar-left, .sidebar-right {
+  .sidebar-left {
     display: none;
+  }
+  .search-bar {
+    display: none;
+  }
+  .nav-center {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    justify-content: space-around;
+    padding: 4px 0;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    z-index: 100;
+  }
+  .nav-icon {
+    width: 44px;
+    height: 44px;
+  }
+  .nav-icon.active::after {
+    display: none;
+  }
+  body {
+    padding-bottom: 56px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .main-container {
+    padding: 4px;
+    gap: 8px;
+  }
+  .navbar {
+    padding: 0 8px;
   }
 }
 
 /* Left Sidebar */
 .sidebar-left {
   position: sticky;
-  top: 72px;
+  top: calc(var(--navbar-height) + 16px);
   height: fit-content;
+  overflow-y: auto;
 }
 
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: clamp(8px, 1.5vw, 12px);
+  padding: clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 12px);
   border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.2s;
   color: var(--text-primary);
   text-decoration: none;
-  font-size: 14px;
+  font-size: clamp(13px, 1.4vw, 14px);
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-item:hover {
   background: var(--hover-bg);
 }
 
-.sidebar-item img, .sidebar-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
+.sidebar-item .sidebar-icon {
+  font-size: clamp(20px, 2.5vw, 24px);
+  flex-shrink: 0;
+  width: clamp(32px, 4vw, 36px);
+  text-align: center;
 }
 
 .divider {
   height: 1px;
   background: var(--divider);
-  margin: 8px 0;
+  margin: clamp(4px, 0.8vw, 8px) 0;
 }
 
-/* Main Feed */
+.section-title {
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+/* Feed */
 .feed {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-/* Stories */
-.stories-container {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 8px 0;
-}
-
-.story-card {
-  min-width: 120px;
-  height: 200px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, #1877f2, #764ba2);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s;
-  flex-shrink: 0;
-}
-
-.story-card:hover {
-  transform: scale(1.02);
-}
-
-.story-card.create {
-  background: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 16px;
-}
-
-.story-card.create .add-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  margin-bottom: 8px;
-}
-
-.story-avatar {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 3px solid var(--primary);
-}
-
-.story-name {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
+  gap: clamp(8px, 1.5vw, 16px);
+  min-width: 0;
 }
 
 /* Create Post Card */
 .create-post-card {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 12px 16px;
+  padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
   box-shadow: var(--shadow);
 }
 
 .create-post-top {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-bottom: 12px;
+  gap: clamp(6px, 1vw, 8px);
+  padding-bottom: clamp(8px, 1.5vw, 12px);
   border-bottom: 1px solid var(--divider);
 }
 
@@ -337,12 +312,13 @@ body {
   flex: 1;
   background: var(--bg);
   border-radius: 50px;
-  padding: 10px 16px;
+  padding: clamp(8px, 1.2vw, 10px) clamp(12px, 2vw, 16px);
   cursor: pointer;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: clamp(14px, 1.6vw, 16px);
   border: none;
   outline: none;
+  min-width: 0;
 }
 
 .create-post-input:focus {
@@ -353,24 +329,26 @@ body {
 .create-post-actions {
   display: flex;
   justify-content: space-around;
-  padding-top: 8px;
+  padding-top: clamp(6px, 1vw, 8px);
+  gap: 4px;
 }
 
 .post-action-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: clamp(4px, 0.8vw, 8px);
+  padding: clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 16px);
   border: none;
   background: none;
   border-radius: var(--radius);
   cursor: pointer;
-  font-size: 14px;
+  font-size: clamp(12px, 1.3vw, 14px);
   font-weight: 500;
   color: var(--text-secondary);
   transition: background 0.2s;
   flex: 1;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .post-action-btn:hover {
@@ -378,7 +356,7 @@ body {
 }
 
 .post-action-btn .icon {
-  font-size: 18px;
+  font-size: clamp(16px, 2vw, 18px);
 }
 
 /* Post Card */
@@ -387,34 +365,46 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .post-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
 }
 
 .post-user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(6px, 1vw, 8px);
+  min-width: 0;
+  flex: 1;
 }
 
 .post-user-name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: clamp(13px, 1.5vw, 14px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .post-time {
-  font-size: 12px;
+  font-size: clamp(11px, 1.2vw, 12px);
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .post-options {
-  width: 36px;
-  height: 36px;
+  width: clamp(32px, 4vw, 36px);
+  height: clamp(32px, 4vw, 36px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -422,8 +412,9 @@ body {
   cursor: pointer;
   border: none;
   background: none;
-  font-size: 20px;
+  font-size: clamp(18px, 2.5vw, 20px);
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .post-options:hover {
@@ -431,49 +422,49 @@ body {
 }
 
 .post-content {
-  padding: 0 16px 12px;
-  font-size: 15px;
+  padding: 0 clamp(12px, 2vw, 16px) clamp(10px, 1.5vw, 12px);
+  font-size: clamp(14px, 1.6vw, 15px);
   line-height: 1.5;
-}
-
-.post-image {
-  width: 100%;
-  max-height: 500px;
-  object-fit: cover;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .post-stats {
   display: flex;
   justify-content: space-between;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
+  font-size: clamp(13px, 1.4vw, 14px);
   color: var(--text-secondary);
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .post-actions {
   display: flex;
   justify-content: space-around;
-  padding: 4px 16px 8px;
+  padding: 4px clamp(8px, 1.5vw, 16px) clamp(6px, 1vw, 8px);
   border-top: 1px solid var(--divider);
   border-bottom: 1px solid var(--divider);
-  margin: 0 16px;
+  margin: 0 clamp(8px, 1.5vw, 16px);
+  gap: 2px;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: clamp(4px, 0.8vw, 6px);
+  padding: clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 16px);
   border: none;
   background: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: clamp(13px, 1.4vw, 14px);
   font-weight: 600;
   color: var(--text-secondary);
   transition: background 0.2s;
   flex: 1;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .action-btn:hover {
@@ -485,44 +476,46 @@ body {
 }
 
 .action-btn .icon {
-  font-size: 18px;
+  font-size: clamp(16px, 2vw, 18px);
 }
 
-/* Comments Section */
+/* Comments */
 .comments-section {
-  padding: 8px 16px;
+  padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
 }
 
 .comment {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  position: relative;
+  gap: clamp(6px, 1vw, 8px);
+  margin-bottom: clamp(8px, 1.5vw, 12px);
 }
 
 .comment-bubble {
   background: var(--bg);
   border-radius: 16px;
-  padding: 8px 12px;
+  padding: clamp(6px, 1vw, 8px) clamp(10px, 1.5vw, 12px);
   flex: 1;
+  min-width: 0;
 }
 
 .comment-author {
   font-weight: 600;
-  font-size: 13px;
+  font-size: clamp(12px, 1.3vw, 13px);
 }
 
 .comment-text {
-  font-size: 14px;
+  font-size: clamp(13px, 1.4vw, 14px);
+  word-wrap: break-word;
 }
 
 .comment-actions {
   display: flex;
-  gap: 12px;
-  font-size: 12px;
+  gap: clamp(8px, 1.5vw, 12px);
+  font-size: clamp(11px, 1.2vw, 12px);
   color: var(--text-secondary);
   margin-top: 4px;
   padding-left: 12px;
+  flex-wrap: wrap;
 }
 
 .comment-actions span {
@@ -537,8 +530,8 @@ body {
 .comment-input-area {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
+  gap: clamp(4px, 0.8vw, 8px);
+  padding: clamp(6px, 1vw, 8px) 0;
   border-top: 1px solid var(--divider);
   margin-top: 8px;
 }
@@ -547,10 +540,11 @@ body {
   flex: 1;
   background: var(--bg);
   border-radius: 50px;
-  padding: 10px 16px;
+  padding: clamp(8px, 1.2vw, 10px) clamp(12px, 2vw, 16px);
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: clamp(13px, 1.4vw, 14px);
+  min-width: 0;
 }
 
 .comment-input:focus {
@@ -564,8 +558,10 @@ body {
   color: var(--primary);
   font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
+  font-size: clamp(13px, 1.4vw, 14px);
   padding: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .comment-submit:disabled {
@@ -576,71 +572,27 @@ body {
 /* Right Sidebar */
 .sidebar-right {
   position: sticky;
-  top: 72px;
+  top: calc(var(--navbar-height) + 16px);
   height: fit-content;
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  padding: 8px 12px;
-}
-
-.contacts-list, .suggestions-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.contact-item, .suggestion-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.contact-item:hover, .suggestion-item:hover {
-  background: var(--hover-bg);
-}
-
-.add-friend-btn {
-  margin-left: auto;
-  background: var(--bg);
-  border: 1px solid var(--divider);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--text-primary);
-}
-
-.add-friend-btn:hover {
-  background: #e4e6eb;
+  overflow-y: auto;
 }
 
 /* Modal */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0,0,0,0.6);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: clamp(12px, 2vw, 20px);
 }
 
 .modal {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  width: 90%;
-  max-width: 500px;
+  width: min(95%, 500px);
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
@@ -650,58 +602,58 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: clamp(12px, 2vw, 16px);
   border-bottom: 1px solid var(--divider);
   position: relative;
 }
 
 .modal-header h2 {
-  font-size: 20px;
+  font-size: clamp(18px, 2.5vw, 20px);
   font-weight: 700;
 }
 
 .close-btn {
   position: absolute;
-  right: 12px;
-  width: 36px;
-  height: 36px;
+  right: clamp(8px, 1.5vw, 12px);
+  width: clamp(32px, 4vw, 36px);
+  height: clamp(32px, 4vw, 36px);
   border-radius: 50%;
   background: var(--bg);
   border: none;
   cursor: pointer;
-  font-size: 20px;
+  font-size: clamp(18px, 2.5vw, 20px);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .modal-body {
-  padding: 16px;
+  padding: clamp(12px, 2vw, 16px);
 }
 
 .modal-body textarea {
   width: 100%;
-  min-height: 120px;
+  min-height: clamp(100px, 15vw, 150px);
   border: none;
   outline: none;
   resize: none;
-  font-size: 18px;
+  font-size: clamp(16px, 2vw, 18px);
   font-family: inherit;
 }
 
 .modal-footer {
-  padding: 16px;
+  padding: clamp(12px, 2vw, 16px);
   border-top: 1px solid var(--divider);
 }
 
 .post-submit-btn {
   width: 100%;
-  padding: 12px;
+  padding: clamp(10px, 1.5vw, 12px);
   background: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: clamp(14px, 1.8vw, 16px);
   font-weight: 600;
   cursor: pointer;
 }
@@ -715,112 +667,185 @@ body {
   cursor: not-allowed;
 }
 
-/* Reactions Bar */
-.reactions-bar {
-  display: flex;
-  gap: 2px;
-  background: white;
-  border-radius: 20px;
-  padding: 4px 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  position: absolute;
-  top: -48px;
-  left: 0;
-}
-
-.reaction-emoji {
-  font-size: 28px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  padding: 4px;
-}
-
-.reaction-emoji:hover {
-  transform: scale(1.4);
-}
-
-/* Dropdown Menu */
-.dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  background: white;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  min-width: 180px;
-  overflow: hidden;
-  z-index: 200;
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s;
-}
-
-.dropdown-item:hover {
-  background: var(--hover-bg);
-}
-
-.dropdown-item.danger {
-  color: #e41e3f;
-}
-
-/* Toast Notification */
+/* Toast */
 .toast {
   position: fixed;
-  bottom: 20px;
+  bottom: clamp(16px, 3vw, 20px);
   left: 50%;
   transform: translateX(-50%);
   background: #333;
   color: white;
-  padding: 12px 24px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: clamp(13px, 1.4vw, 14px);
   z-index: 2000;
   animation: slideUp 0.3s ease;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes slideUp {
-  from {
-    transform: translate(-50%, 100%);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
+  from { transform: translate(-50%, 100%); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
 }
 
-/* Utility */
-.hidden {
-  display: none !important;
+/* Hidden */
+.hidden { display: none !important; }
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: clamp(24px, 4vw, 40px) clamp(16px, 3vw, 20px);
+  color: var(--text-secondary);
 }
 
-.text-primary {
-  color: var(--primary);
+.empty-state .empty-icon {
+  font-size: clamp(36px, 6vw, 48px);
+  margin-bottom: clamp(8px, 1.5vw, 16px);
 }
 
-.font-bold {
+.empty-state h3 {
+  font-size: clamp(16px, 2.5vw, 20px);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: clamp(13px, 1.5vw, 14px);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Auth Pages */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: clamp(12px, 2vw, 20px);
+}
+
+.auth-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: clamp(16px, 3vw, 20px);
+  box-shadow: var(--shadow-lg);
+  width: min(100%, 400px);
+}
+
+.auth-card h2 {
+  font-size: clamp(20px, 3vw, 24px);
+  margin-bottom: clamp(12px, 2vw, 16px);
+}
+
+.auth-input {
+  width: 100%;
+  padding: clamp(12px, 1.8vw, 14px);
+  margin-bottom: clamp(10px, 1.5vw, 12px);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: clamp(14px, 1.8vw, 16px);
+}
+
+.auth-input:focus {
+  outline: 2px solid var(--primary);
+  border-color: var(--primary);
+}
+
+.auth-btn {
+  width: 100%;
+  padding: clamp(12px, 1.8vw, 14px);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(16px, 2vw, 18px);
   font-weight: 700;
-}
-
-.cursor-pointer {
   cursor: pointer;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.auth-btn:hover {
+  background: var(--primary-hover);
 }
 
-.fade-in {
-  animation: fadeIn 0.3s ease;
+.auth-link {
+  text-align: center;
+  margin-top: clamp(12px, 2vw, 16px);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: clamp(13px, 1.5vw, 14px);
+  font-weight: 600;
+}
+
+.error-msg {
+  background: #fce4e4;
+  color: #c33;
+  padding: clamp(8px, 1.5vw, 10px);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: none;
+  font-size: clamp(13px, 1.4vw, 14px);
+}
+
+/* Profile Page */
+.profile-cover {
+  height: clamp(120px, 20vw, 200px);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  position: relative;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.profile-info {
+  padding: 0 clamp(16px, 3vw, 20px) clamp(16px, 3vw, 20px);
+  position: relative;
+}
+
+.profile-avatar-wrapper {
+  margin-top: clamp(-40px, -6vw, -84px);
+}
+
+.profile-avatar {
+  width: clamp(80px, 15vw, 168px);
+  height: clamp(80px, 15vw, 168px);
+  border-radius: 50%;
+  border: 4px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: clamp(28px, 5vw, 64px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
 }
 </style>
 </head>
@@ -840,8 +865,8 @@ let user = null
 let currentPage = 'home'
 let userLikes = new Set()
 let userProfile = null
-let notifications = []
-let showCreatePostModal = false
+let friends = []
+let friendRequests = []
 
 const app = document.getElementById("app")
 
@@ -854,7 +879,7 @@ async function init() {
     
     if (session?.user) {
       user = session.user
-      await loadUserData()
+      await loadAllUserData()
       renderApp()
     } else {
       renderAuthPage('login')
@@ -863,48 +888,94 @@ async function init() {
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         user = session.user
-        await loadUserData()
+        await loadAllUserData()
         renderApp()
       } else {
         user = null
         userProfile = null
+        userLikes.clear()
+        friends = []
+        friendRequests = []
         renderAuthPage('login')
       }
     })
   } catch (error) {
     console.error("Init error:", error)
-    app.innerHTML = '<div style="text-align:center;padding:40px;">❌ Failed to load app</div>'
+    app.innerHTML = '<div style="text-align:center;padding:40px;">❌ Failed to load app. Please try again.</div>'
   }
 }
 
-async function loadUserData() {
+async function loadAllUserData() {
   if (!user) return
   
-  // Load likes
+  await Promise.all([
+    loadUserLikes(),
+    loadUserProfile(),
+    loadFriends(),
+    loadFriendRequests()
+  ])
+}
+
+async function loadUserLikes() {
   try {
     const { data } = await supabase
       .from('post_likes')
       .select('post_id')
       .eq('user_id', user.id)
     userLikes = new Set(data?.map(d => d.post_id) || [])
-  } catch(e) { console.log('Likes table may not exist') }
-  
-  // Load profile
+  } catch(e) {
+    userLikes = new Set()
+  }
+}
+
+async function loadUserProfile() {
   try {
     const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
-    userProfile = data
-  } catch(e) { 
-    userProfile = {
+    userProfile = data || {
       id: user.id,
-      username: user.user_metadata?.username || 'User',
+      username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
       avatar_url: null,
       cover_url: null,
       bio: ''
     }
+  } catch(e) {
+    userProfile = {
+      id: user.id,
+      username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+      avatar_url: null,
+      cover_url: null,
+      bio: ''
+    }
+  }
+}
+
+async function loadFriends() {
+  try {
+    const { data } = await supabase
+      .from('friendships')
+      .select('friend:profiles!friendships_friend_id_fkey(*)')
+      .eq('user_id', user.id)
+      .eq('status', 'accepted')
+    friends = data?.map(d => d.friend).filter(Boolean) || []
+  } catch(e) {
+    friends = []
+  }
+}
+
+async function loadFriendRequests() {
+  try {
+    const { data } = await supabase
+      .from('friendships')
+      .select('user:profiles!friendships_user_id_fkey(*)')
+      .eq('friend_id', user.id)
+      .eq('status', 'pending')
+    friendRequests = data?.map(d => d.user).filter(Boolean) || []
+  } catch(e) {
+    friendRequests = []
   }
 }
 
@@ -913,38 +984,25 @@ function renderAuthPage(page) {
   const isLogin = page === 'login'
   
   app.innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);">
-      <div style="display:flex;gap:40px;align-items:center;max-width:980px;padding:20px;flex-wrap:wrap;justify-content:center;">
-        <div style="flex:1;min-width:300px;">
-          <h1 style="font-size:56px;font-weight:800;color:var(--primary);margin-bottom:8px;">WEEM</h1>
-          <p style="font-size:24px;color:var(--text-primary);">Connect with friends and the world around you on WEEM.</p>
-        </div>
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2>${isLogin ? 'Log in to WEEM' : 'Create Account'}</h2>
         
-        <div style="flex:1;min-width:300px;max-width:400px;">
-          <div style="background:white;border-radius:8px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.15);">
-            <h2 style="margin-bottom:16px;">${isLogin ? 'Log in' : 'Create Account'}</h2>
-            
-            <div id="error-msg" style="background:#fce4e4;color:#c33;padding:10px;border-radius:6px;margin-bottom:12px;display:none;"></div>
-            
-            ${!isLogin ? `
-              <input id="auth-username" placeholder="Username" style="width:100%;padding:14px;margin-bottom:12px;border:1px solid #ddd;border-radius:6px;font-size:16px;">
-            ` : ''}
-            
-            <input id="auth-email" type="email" placeholder="Email" style="width:100%;padding:14px;margin-bottom:12px;border:1px solid #ddd;border-radius:6px;font-size:16px;">
-            <input id="auth-password" type="password" placeholder="Password" style="width:100%;padding:14px;margin-bottom:16px;border:1px solid #ddd;border-radius:6px;font-size:16px;">
-            
-            <button onclick="${isLogin ? 'handleLogin()' : 'handleSignup()'}" 
-              style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:6px;font-size:18px;font-weight:700;cursor:pointer;">
-              ${isLogin ? 'Log In' : 'Sign Up'}
-            </button>
-            
-            <div style="text-align:center;margin-top:16px;">
-              <a href="#" onclick="${isLogin ? "renderAuthPage('signup')" : "renderAuthPage('login')"};return false;" 
-                style="color:var(--primary);text-decoration:none;font-size:14px;font-weight:600;">
-                ${isLogin ? 'Create new account' : 'Already have an account?'}
-              </a>
-            </div>
-          </div>
+        <div class="error-msg" id="error-msg"></div>
+        
+        ${!isLogin ? `
+          <input class="auth-input" id="auth-username" placeholder="Username" autocomplete="username">
+        ` : ''}
+        
+        <input class="auth-input" id="auth-email" type="email" placeholder="Email" autocomplete="email">
+        <input class="auth-input" id="auth-password" type="password" placeholder="Password" autocomplete="${isLogin ? 'current-password' : 'new-password'}">
+        
+        <button class="auth-btn" onclick="${isLogin ? 'handleLogin()' : 'handleSignup()'}">
+          ${isLogin ? 'Log In' : 'Sign Up'}
+        </button>
+        
+        <div class="auth-link" onclick="renderAuthPage('${isLogin ? 'signup' : 'login'}')">
+          ${isLogin ? 'Create new account' : 'Already have an account? Log in'}
         </div>
       </div>
     </div>
@@ -952,8 +1010,8 @@ function renderAuthPage(page) {
 }
 
 window.handleLogin = async function() {
-  const email = document.getElementById('auth-email').value.trim()
-  const password = document.getElementById('auth-password').value
+  const email = document.getElementById('auth-email')?.value.trim()
+  const password = document.getElementById('auth-password')?.value
   
   if (!email || !password) return showAuthError('Please fill in all fields')
   
@@ -963,8 +1021,8 @@ window.handleLogin = async function() {
 
 window.handleSignup = async function() {
   const username = document.getElementById('auth-username')?.value.trim()
-  const email = document.getElementById('auth-email').value.trim()
-  const password = document.getElementById('auth-password').value
+  const email = document.getElementById('auth-email')?.value.trim()
+  const password = document.getElementById('auth-password')?.value
   
   if (!username || !email || !password) return showAuthError('Please fill in all fields')
   if (password.length < 6) return showAuthError('Password must be at least 6 characters')
@@ -979,6 +1037,7 @@ window.handleSignup = async function() {
   
   if (data?.session) {
     user = data.user
+    await loadAllUserData()
     renderApp()
   } else {
     showAuthError('Check your email to confirm your account', 'success')
@@ -987,118 +1046,88 @@ window.handleSignup = async function() {
 
 function showAuthError(msg, type = 'error') {
   const div = document.getElementById('error-msg')
-  if (div) {
-    div.textContent = msg
-    div.style.display = 'block'
-    div.style.background = type === 'success' ? '#e4fce4' : '#fce4e4'
-    div.style.color = type === 'success' ? '#3a3' : '#c33'
-    setTimeout(() => div.style.display = 'none', 4000)
-  }
+  if (!div) return
+  div.textContent = msg
+  div.style.display = 'block'
+  div.style.background = type === 'success' ? '#e4fce4' : '#fce4e4'
+  div.style.color = type === 'success' ? '#3a3' : '#c33'
+  setTimeout(() => { div.style.display = 'none' }, 5000)
 }
 
 // ==================== MAIN APP ====================
 async function renderApp() {
   const avatarColor = stringToColor(user?.email || 'user')
   const initials = getInitials(userProfile?.username || user?.email || 'U')
+  const displayName = escapeHtml(userProfile?.username || 'User')
   
   app.innerHTML = `
-    <!-- Navbar -->
     <nav class="navbar">
       <div class="nav-container">
         <div class="nav-left">
-          <span class="logo" onclick="currentPage='home';renderPage()" style="cursor:pointer;">WEEM</span>
+          <span class="logo" onclick="switchPage('home')">WEEM</span>
           <div class="search-bar">
             <span>🔍</span>
-            <input type="text" placeholder="Search WEEM" onfocus="showToast('Search coming soon!')">
+            <input type="text" placeholder="Search WEEM" onfocus="showToast('Search coming soon')">
           </div>
         </div>
         
         <div class="nav-center" id="nav-center">
-          <button class="nav-icon ${currentPage==='home'?'active':''}" onclick="switchPage('home')">🏠</button>
-          <button class="nav-icon ${currentPage==='friends'?'active':''}" onclick="switchPage('friends')">👥</button>
-          <button class="nav-icon ${currentPage==='watch'?'active':''}" onclick="switchPage('watch')">📺</button>
-          <button class="nav-icon ${currentPage==='groups'?'active':''}" onclick="switchPage('groups')">👪</button>
+          <button class="nav-icon ${currentPage==='home'?'active':''}" onclick="switchPage('home')" aria-label="Home">🏠</button>
+          <button class="nav-icon ${currentPage==='friends'?'active':''}" onclick="switchPage('friends')" aria-label="Friends">👥</button>
+          <button class="nav-icon ${currentPage==='watch'?'active':''}" onclick="switchPage('watch')" aria-label="Watch">📺</button>
+          <button class="nav-icon ${currentPage==='groups'?'active':''}" onclick="switchPage('groups')" aria-label="Groups">👪</button>
         </div>
         
         <div class="nav-right">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="nav-icon" onclick="showToast('Menu')" style="width:40px;height:40px;border-radius:50%;background:var(--bg);">
-              ⚙️
-            </button>
-            <button class="nav-icon" style="width:40px;height:40px;border-radius:50%;background:var(--bg);position:relative;" onclick="showToast('Notifications')">
-              🔔
-              <span class="badge">3</span>
-            </button>
-            <div class="user-avatar" style="background:${avatarColor};" onclick="switchPage('profile')">
-              ${initials}
-              <span class="online-dot"></span>
-            </div>
+          <div class="user-avatar" style="background:${avatarColor};" onclick="switchPage('profile')" title="${displayName}">
+            ${initials}
           </div>
         </div>
       </div>
     </nav>
     
-    <!-- Main Content -->
-    <div class="main-container" id="main-content">
-      <!-- Left Sidebar -->
-      <div class="sidebar-left">
-        <a class="sidebar-item" onclick="switchPage('profile')" style="cursor:pointer;">
+    <div class="main-container">
+      <div class="sidebar-left" id="sidebar-left">
+        <div class="sidebar-item" onclick="switchPage('profile')">
           <div class="user-avatar sm" style="background:${avatarColor};">${initials}</div>
-          <span>${escapeHtml(userProfile?.username || 'User')}</span>
-        </a>
-        <a class="sidebar-item" onclick="switchPage('friends')" style="cursor:pointer;">
-          <span style="font-size:24px;">👥</span> Friends
-        </a>
-        <a class="sidebar-item" onclick="switchPage('groups')" style="cursor:pointer;">
-          <span style="font-size:24px;">👪</span> Groups
-        </a>
-        <a class="sidebar-item" onclick="switchPage('watch')" style="cursor:pointer;">
-          <span style="font-size:24px;">📺</span> Watch
-        </a>
-        <a class="sidebar-item" onclick="switchPage('memories')" style="cursor:pointer;">
-          <span style="font-size:24px;">🕐</span> Memories
-        </a>
-        <a class="sidebar-item" onclick="switchPage('saved')" style="cursor:pointer;">
-          <span style="font-size:24px;">📌</span> Saved
-        </a>
+          <span>${displayName}</span>
+        </div>
+        <div class="sidebar-item" onclick="switchPage('friends')">
+          <span class="sidebar-icon">👥</span> Friends
+        </div>
+        <div class="sidebar-item" onclick="switchPage('groups')">
+          <span class="sidebar-icon">👪</span> Groups
+        </div>
+        <div class="sidebar-item" onclick="switchPage('watch')">
+          <span class="sidebar-icon">📺</span> Watch
+        </div>
+        <div class="sidebar-item" onclick="switchPage('memories')">
+          <span class="sidebar-icon">🕐</span> Memories
+        </div>
+        <div class="sidebar-item" onclick="switchPage('saved')">
+          <span class="sidebar-icon">📌</span> Saved
+        </div>
         <div class="divider"></div>
         <div class="section-title">Your shortcuts</div>
-        <a class="sidebar-item" onclick="showToast('Gaming')">
-          <span style="font-size:24px;">🎮</span> Gaming
-        </a>
-        <a class="sidebar-item" onclick="showToast('Marketplace')">
-          <span style="font-size:24px;">🛒</span> Marketplace
-        </a>
-      </div>
-      
-      <!-- Feed -->
-      <div class="feed" id="feed-container">
-        ${await renderFeedContent()}
-      </div>
-      
-      <!-- Right Sidebar -->
-      <div class="sidebar-right">
-        <div class="section-title">Sponsored</div>
-        <div style="padding:8px 12px;">
-          <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:8px;padding:16px;color:white;margin-bottom:8px;">
-            <strong>Try Premium Today!</strong>
-            <p style="font-size:12px;margin-top:4px;">Ad-free experience</p>
-          </div>
+        <div class="sidebar-item" onclick="showToast('Gaming coming soon')">
+          <span class="sidebar-icon">🎮</span> Gaming
         </div>
-        <div class="divider"></div>
+        <div class="sidebar-item" onclick="showToast('Marketplace coming soon')">
+          <span class="sidebar-icon">🛒</span> Marketplace
+        </div>
+      </div>
+      
+      <div class="feed" id="feed-container"></div>
+      
+      <div class="sidebar-right" id="sidebar-right">
         <div class="section-title">Friend Requests</div>
-        <div class="suggestions-list" id="friend-requests">
-          <div style="padding:8px 12px;color:var(--text-secondary);">No new requests</div>
-        </div>
+        <div id="friend-requests-container"></div>
         <div class="divider"></div>
         <div class="section-title">Contacts</div>
-        <div class="contacts-list" id="contacts-list">
-          <div style="padding:8px 12px;color:var(--text-secondary);">Loading...</div>
-        </div>
+        <div id="contacts-container"></div>
       </div>
     </div>
     
-    <!-- Create Post Modal -->
     <div id="create-post-modal" class="modal-overlay hidden">
       <div class="modal">
         <div class="modal-header">
@@ -1108,11 +1137,9 @@ async function renderApp() {
         <div class="modal-body">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
             <div class="user-avatar sm" style="background:${avatarColor};">${initials}</div>
-            <div>
-              <div style="font-weight:600;">${escapeHtml(userProfile?.username || 'User')}</div>
-            </div>
+            <div style="font-weight:600;">${displayName}</div>
           </div>
-          <textarea id="new-post-content" placeholder="What's on your mind, ${escapeHtml(userProfile?.username || 'User')}?" style="width:100%;min-height:150px;border:none;outline:none;resize:none;font-size:18px;font-family:inherit;"></textarea>
+          <textarea id="new-post-content" placeholder="What's on your mind, ${displayName}?"></textarea>
         </div>
         <div class="modal-footer">
           <button class="post-submit-btn" id="post-submit-btn" onclick="createPost()">Post</button>
@@ -1120,173 +1147,11 @@ async function renderApp() {
       </div>
     </div>
     
-    <!-- Toast container -->
     <div id="toast-container"></div>
   `
   
-  // Load feed content
-  if (currentPage === 'home') {
-    await loadFeed()
-  }
-}
-
-async function renderFeedContent() {
-  return `
-    <!-- Stories -->
-    <div class="stories-container">
-      <div class="story-card create" onclick="showToast('Create story')">
-        <div class="add-icon">+</div>
-        <span style="font-weight:600;font-size:13px;">Create story</span>
-      </div>
-      ${Array.from({length: 4}, (_, i) => `
-        <div class="story-card" style="background:linear-gradient(180deg,${['#1877f2','#e41e3f','#42b72a','#f7b928'][i]},#764ba2);" onclick="showToast('View story')">
-          <div class="story-avatar" style="background:#ccc;"></div>
-          <div class="story-name">Friend ${i+1}</div>
-        </div>
-      `).join('')}
-    </div>
-    
-    <!-- Create Post -->
-    <div class="create-post-card">
-      <div class="create-post-top">
-        <div class="user-avatar sm" style="background:${stringToColor(user?.email || 'user')};">
-          ${getInitials(userProfile?.username || user?.email || 'U')}
-        </div>
-        <div class="create-post-input" onclick="openCreatePost()">
-          What's on your mind?
-        </div>
-      </div>
-      <div class="create-post-actions">
-        <button class="post-action-btn" onclick="showToast('Live video')">
-          <span class="icon">📹</span> Live video
-        </button>
-        <button class="post-action-btn" onclick="openCreatePost()">
-          <span class="icon">🖼️</span> Photo/video
-        </button>
-        <button class="post-action-btn" onclick="showToast('Feeling')">
-          <span class="icon">😊</span> Feeling
-        </button>
-      </div>
-    </div>
-    
-    <!-- Posts Container -->
-    <div id="posts-container">
-      <div style="text-align:center;padding:20px;color:var(--text-secondary);">Loading posts...</div>
-    </div>
-  `
-}
-
-// ==================== LOAD FEED ====================
-async function loadFeed() {
-  const container = document.getElementById('posts-container')
-  if (!container) return
-  
-  try {
-    const { data: posts, error } = await supabase
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20)
-    
-    if (error) throw error
-    
-    if (!posts || posts.length === 0) {
-      container.innerHTML = `
-        <div style="text-align:center;padding:40px;color:var(--text-secondary);">
-          <div style="font-size:48px;margin-bottom:16px;">📝</div>
-          <h3>No posts yet</h3>
-          <p>Be the first to share something!</p>
-        </div>
-      `
-      return
-    }
-    
-    // Get like counts
-    const postsWithLikes = await Promise.all(posts.map(async post => {
-      let likes = 0
-      try {
-        const { count } = await supabase
-          .from('post_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id)
-        likes = count || 0
-      } catch(e) {}
-      return { ...post, likes }
-    }))
-    
-    container.innerHTML = postsWithLikes.map(post => {
-      const isLiked = userLikes.has(post.id)
-      const authorName = post.user_id === user.id ? (userProfile?.username || 'You') : 'User'
-      const authorInitials = getInitials(authorName)
-      const authorColor = stringToColor(authorName)
-      
-      return `
-        <div class="post-card fade-in">
-          <div class="post-header">
-            <div class="post-user-info">
-              <div class="user-avatar sm" style="background:${authorColor};">${authorInitials}</div>
-              <div>
-                <div class="post-user-name">${escapeHtml(authorName)}</div>
-                <div class="post-time">${formatTimeAgo(post.created_at)} · 🌍</div>
-              </div>
-            </div>
-            <button class="post-options" onclick="showPostOptions('${post.id}')">⋯</button>
-          </div>
-          
-          <div class="post-content">
-            ${escapeHtml(post.content || '')}
-          </div>
-          
-          <div class="post-stats">
-            <span>${post.likes > 0 ? `👍 ${post.likes}` : ''}</span>
-            <span>${post.likes > 0 ? `${post.likes} comments · 0 shares` : ''}</span>
-          </div>
-          
-          <div class="post-actions">
-            <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}', ${post.likes}, ${isLiked})">
-              <span class="icon">${isLiked ? '❤️' : '🤍'}</span> Like
-            </button>
-            <button class="action-btn" onclick="focusComment('${post.id}')">
-              <span class="icon">💬</span> Comment
-            </button>
-            <button class="action-btn" onclick="showToast('Share')">
-              <span class="icon">↗️</span> Share
-            </button>
-          </div>
-          
-          <div class="comments-section" id="comments-${post.id}">
-            ${post.likes > 0 ? `
-              <div class="comment">
-                <div class="user-avatar sm" style="background:#1877f2;">U</div>
-                <div class="comment-bubble">
-                  <div class="comment-author">User</div>
-                  <div class="comment-text">Great post! 👍</div>
-                </div>
-              </div>
-            ` : '<div style="text-align:center;color:var(--text-secondary);font-size:13px;padding:8px;">Be the first to comment</div>'}
-            
-            <div class="comment-input-area">
-              <div class="user-avatar sm" style="background:${stringToColor(user?.email || 'user')};">
-                ${getInitials(userProfile?.username || user?.email || 'U')}
-              </div>
-              <input 
-                type="text" 
-                class="comment-input" 
-                id="comment-input-${post.id}" 
-                placeholder="Write a comment..."
-                onkeypress="if(event.key==='Enter') addComment('${post.id}')"
-              >
-              <button class="comment-submit" onclick="addComment('${post.id}')">Post</button>
-            </div>
-          </div>
-        </div>
-      `
-    }).join('')
-    
-  } catch (error) {
-    console.error("Feed error:", error)
-    container.innerHTML = `<div style="text-align:center;padding:20px;color:#c33;">Failed to load posts</div>`
-  }
+  await renderPage()
+  updateSidebarContent()
 }
 
 // ==================== PAGE SWITCHING ====================
@@ -1294,7 +1159,6 @@ window.switchPage = function(page) {
   currentPage = page
   renderPage()
   
-  // Update nav icons
   document.querySelectorAll('.nav-icon').forEach(btn => btn.classList.remove('active'))
   const activeBtn = document.querySelector(`.nav-icon[onclick="switchPage('${page}')"]`)
   if (activeBtn) activeBtn.classList.add('active')
@@ -1304,33 +1168,213 @@ async function renderPage() {
   const container = document.getElementById('feed-container')
   if (!container) return
   
+  const avatarColor = stringToColor(user?.email || 'user')
+  const initials = getInitials(userProfile?.username || user?.email || 'U')
+  const displayName = escapeHtml(userProfile?.username || 'User')
+  
   switch(currentPage) {
     case 'home':
-      container.innerHTML = await renderFeedContent()
+      container.innerHTML = `
+        <div class="create-post-card">
+          <div class="create-post-top">
+            <div class="user-avatar sm" style="background:${avatarColor};">${initials}</div>
+            <div class="create-post-input" onclick="openCreatePost()">What's on your mind, ${displayName}?</div>
+          </div>
+          <div class="create-post-actions">
+            <button class="post-action-btn" onclick="showToast('Live video coming soon')">
+              <span class="icon">📹</span> Live video
+            </button>
+            <button class="post-action-btn" onclick="openCreatePost()">
+              <span class="icon">🖼️</span> Photo/video
+            </button>
+            <button class="post-action-btn" onclick="showToast('Feeling coming soon')">
+              <span class="icon">😊</span> Feeling
+            </button>
+          </div>
+        </div>
+        <div id="posts-container"></div>
+      `
       await loadFeed()
       break
+      
     case 'profile':
       container.innerHTML = await renderProfilePage()
       break
+      
     case 'friends':
-      container.innerHTML = renderFriendsPage()
+      container.innerHTML = await renderFriendsPage()
       break
+      
     case 'watch':
       container.innerHTML = renderWatchPage()
       break
+      
     case 'groups':
       container.innerHTML = renderGroupsPage()
       break
+      
     default:
       container.innerHTML = renderGenericPage(currentPage)
   }
 }
 
+// ==================== FEED ====================
+async function loadFeed() {
+  const container = document.getElementById('posts-container')
+  if (!container) return
+  
+  container.innerHTML = `
+    <div class="post-card"><div style="padding:16px;">
+      <div class="skeleton" style="height:16px;width:60%;margin-bottom:12px;"></div>
+      <div class="skeleton" style="height:12px;width:80%;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:12px;width:40%;"></div>
+    </div></div>
+    <div class="post-card"><div style="padding:16px;">
+      <div class="skeleton" style="height:16px;width:50%;margin-bottom:12px;"></div>
+      <div class="skeleton" style="height:12px;width:90%;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:12px;width:30%;"></div>
+    </div></div>
+  `
+  
+  try {
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(30)
+    
+    if (error) throw error
+    
+    if (!posts || posts.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>No posts yet</h3>
+          <p>Be the first to share something with your friends!</p>
+        </div>
+      `
+      return
+    }
+    
+    const postsWithLikes = await Promise.all(posts.map(async post => {
+      let likes = 0
+      let comments = []
+      try {
+        const { count: likeCount } = await supabase
+          .from('post_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id)
+        likes = likeCount || 0
+      } catch(e) {}
+      
+      try {
+        const { data: commentData } = await supabase
+          .from('comments')
+          .select('*')
+          .eq('post_id', post.id)
+          .order('created_at', { ascending: true })
+          .limit(5)
+        comments = commentData || []
+      } catch(e) {}
+      
+      return { ...post, likes, comments }
+    }))
+    
+    container.innerHTML = postsWithLikes.map(post => renderPostCard(post)).join('')
+    
+  } catch (error) {
+    console.error("Feed error:", error)
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">❌</div>
+        <h3>Failed to load posts</h3>
+        <p>Please try again later</p>
+        <button onclick="loadFeed()" style="margin-top:12px;padding:8px 16px;background:var(--primary);color:white;border:none;border-radius:6px;cursor:pointer;">Retry</button>
+      </div>
+    `
+  }
+}
+
+function renderPostCard(post) {
+  const isLiked = userLikes.has(post.id)
+  const authorName = post.user_id === user?.id ? (userProfile?.username || 'You') : 'User'
+  const authorInitials = getInitials(authorName)
+  const authorColor = stringToColor(authorName)
+  
+  return `
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-user-info">
+          <div class="user-avatar sm" style="background:${authorColor};">${authorInitials}</div>
+          <div>
+            <div class="post-user-name">${escapeHtml(authorName)}</div>
+            <div class="post-time">${formatTimeAgo(post.created_at)}</div>
+          </div>
+        </div>
+        <button class="post-options" onclick="showToast('Post options')">⋯</button>
+      </div>
+      
+      <div class="post-content">${escapeHtml(post.content || '')}</div>
+      
+      ${post.likes > 0 || (post.comments && post.comments.length > 0) ? `
+        <div class="post-stats">
+          <span>${post.likes > 0 ? `❤️ ${post.likes}` : ''}</span>
+          <span>${post.comments && post.comments.length > 0 ? `${post.comments.length} comments` : ''}</span>
+        </div>
+      ` : ''}
+      
+      <div class="post-actions">
+        <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}', ${post.likes}, ${isLiked})">
+          <span class="icon">${isLiked ? '❤️' : '🤍'}</span> Like
+        </button>
+        <button class="action-btn" onclick="focusComment('${post.id}')">
+          <span class="icon">💬</span> Comment
+        </button>
+        <button class="action-btn" onclick="showToast('Share coming soon')">
+          <span class="icon">↗️</span> Share
+        </button>
+      </div>
+      
+      <div class="comments-section" id="comments-${post.id}">
+        ${post.comments && post.comments.length > 0 ? post.comments.map(c => `
+          <div class="comment">
+            <div class="user-avatar sm" style="background:${stringToColor('user')};">U</div>
+            <div>
+              <div class="comment-bubble">
+                <div class="comment-author">User</div>
+                <div class="comment-text">${escapeHtml(c.content)}</div>
+              </div>
+              <div class="comment-actions">
+                <span>Like</span> · <span>Reply</span> · ${formatTimeAgo(c.created_at)}
+              </div>
+            </div>
+          </div>
+        `).join('') : ''}
+        
+        <div class="comment-input-area">
+          <div class="user-avatar sm" style="background:${stringToColor(user?.email || 'user')};">
+            ${getInitials(userProfile?.username || user?.email || 'U')}
+          </div>
+          <input 
+            type="text" 
+            class="comment-input" 
+            id="comment-input-${post.id}" 
+            placeholder="Write a comment..."
+            onkeypress="if(event.key==='Enter') addComment('${post.id}')"
+          >
+          <button class="comment-submit" onclick="addComment('${post.id}')">Post</button>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+// ==================== PROFILE PAGE ====================
 async function renderProfilePage() {
   const avatarColor = stringToColor(user?.email || 'user')
   const initials = getInitials(userProfile?.username || user?.email || 'U')
+  const displayName = escapeHtml(userProfile?.username || 'User')
   
-  // Load user's posts
   const { data: userPosts } = await supabase
     .from('posts')
     .select('*')
@@ -1338,101 +1382,87 @@ async function renderProfilePage() {
     .order('created_at', { ascending: false })
   
   return `
-    <div style="background:white;border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.1);">
-      <!-- Cover Photo -->
-      <div style="height:200px;background:linear-gradient(135deg,#667eea,#764ba2);position:relative;">
-        <button style="position:absolute;bottom:12px;right:12px;background:white;border:none;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">
-          ✏️ Edit cover
-        </button>
-      </div>
+    <div style="background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);">
+      <div class="profile-cover"></div>
       
-      <div style="padding:0 20px 20px;position:relative;">
-        <div class="user-avatar lg" style="background:${avatarColor};margin-top:-84px;border:4px solid white;">
-          ${initials}
+      <div class="profile-info">
+        <div class="profile-avatar-wrapper">
+          <div class="profile-avatar" style="background:${avatarColor};">${initials}</div>
         </div>
         
-        <h2 style="margin-top:8px;">${escapeHtml(userProfile?.username || 'User')}</h2>
-        <p style="color:var(--text-secondary);">@${escapeHtml(user?.email?.split('@')[0] || 'user')}</p>
+        <h2 style="margin-top:8px;font-size:clamp(20px,3vw,24px);">${displayName}</h2>
+        <p style="color:var(--text-secondary);font-size:clamp(13px,1.5vw,14px);">@${escapeHtml(user?.email?.split('@')[0] || 'user')}</p>
+        ${userProfile?.bio ? `<p style="margin-top:8px;font-size:clamp(14px,1.6vw,15px);">${escapeHtml(userProfile.bio)}</p>` : ''}
         
-        <div style="display:flex;gap:8px;margin-top:12px;">
-          <button style="background:var(--primary);color:white;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;">
-            ✏️ Edit Profile
-          </button>
-          <button style="background:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;">
-            ⋯
-          </button>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+          <button style="background:var(--primary);color:white;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:clamp(13px,1.4vw,14px);">✏️ Edit Profile</button>
+          <button onclick="handleLogout()" style="background:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:clamp(13px,1.4vw,14px);">🚪 Logout</button>
         </div>
         
-        <div style="display:flex;gap:16px;margin-top:12px;font-size:14px;color:var(--text-secondary);">
+        <div style="display:flex;gap:16px;margin-top:12px;font-size:clamp(13px,1.4vw,14px);color:var(--text-secondary);flex-wrap:wrap;">
           <span><strong>${userPosts?.length || 0}</strong> posts</span>
-          <span><strong>0</strong> friends</span>
+          <span><strong>${friends.length}</strong> friends</span>
         </div>
       </div>
     </div>
     
-    <!-- User's Posts -->
     <div style="margin-top:16px;">
-      <h3 style="margin-bottom:12px;">Posts</h3>
-      ${userPosts?.length ? userPosts.map(post => `
-        <div class="post-card" style="margin-bottom:12px;">
-          <div class="post-header">
-            <div class="post-user-info">
-              <div class="user-avatar sm" style="background:${avatarColor};">${initials}</div>
-              <div>
-                <div class="post-user-name">${escapeHtml(userProfile?.username || 'User')}</div>
-                <div class="post-time">${formatTimeAgo(post.created_at)}</div>
+      <h3 style="font-size:clamp(16px,2vw,18px);margin-bottom:12px;">Your Posts</h3>
+      ${userPosts && userPosts.length > 0 ? userPosts.map(post => renderPostCard({...post, likes: 0, comments: []})).join('') : `
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>No posts yet</h3>
+          <p>Share your first post!</p>
+        </div>
+      `}
+    </div>
+  `
+}
+
+// ==================== FRIENDS PAGE ====================
+async function renderFriendsPage() {
+  return `
+    <div style="background:var(--surface);border-radius:var(--radius-lg);padding:clamp(16px,3vw,20px);box-shadow:var(--shadow);">
+      <h2 style="font-size:clamp(18px,2.5vw,22px);margin-bottom:16px;">Friends</h2>
+      
+      ${friends.length > 0 ? `
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:12px;">
+          ${friends.map(friend => `
+            <div style="border:1px solid var(--divider);border-radius:var(--radius);overflow:hidden;">
+              <div style="height:100px;background:${stringToColor(friend.username || 'user')};display:flex;align-items:center;justify-content:center;">
+                <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:24px;font-weight:bold;">
+                  ${getInitials(friend.username || 'U')}
+                </div>
+              </div>
+              <div style="padding:12px;">
+                <strong style="font-size:clamp(13px,1.4vw,14px);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(friend.username || 'User')}</strong>
+                <button style="width:100%;margin-top:8px;padding:6px;background:var(--bg);border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:clamp(12px,1.3vw,13px);">
+                  ✉️ Message
+                </button>
               </div>
             </div>
-          </div>
-          <div class="post-content">${escapeHtml(post.content || '')}</div>
+          `).join('')}
         </div>
-      `).join('') : '<p style="color:var(--text-secondary);">No posts yet</p>'}
-    </div>
-    
-    <button style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:6px;margin-top:12px;font-weight:600;cursor:pointer;" onclick="handleLogout()">
-      Logout
-    </button>
-  `
-}
-
-function renderFriendsPage() {
-  return `
-    <div style="background:white;border-radius:8px;padding:20px;">
-      <h2>Friends</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px;">
-        ${Array.from({length:6}, (_, i) => `
-          <div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;">
-            <div style="height:120px;background:linear-gradient(135deg,${['#1877f2','#42b72a','#f7b928','#e41e3f','#764ba2','#00a884'][i]},#ccc);"></div>
-            <div style="padding:12px;">
-              <strong>Friend ${i+1}</strong>
-              <p style="font-size:12px;color:var(--text-secondary);">Mutual friends</p>
-              <button style="width:100%;margin-top:8px;padding:6px;background:var(--bg);border:none;border-radius:6px;font-weight:600;cursor:pointer;">
-                ✉️ Message
-              </button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
+      ` : `
+        <div class="empty-state">
+          <div class="empty-icon">👥</div>
+          <h3>No friends yet</h3>
+          <p>Connect with people to see them here</p>
+        </div>
+      `}
     </div>
   `
 }
 
+// ==================== OTHER PAGES ====================
 function renderWatchPage() {
   return `
-    <div style="background:white;border-radius:8px;padding:20px;">
-      <h2>Watch</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:16px;">
-        ${Array.from({length:4}, (_, i) => `
-          <div style="border-radius:8px;overflow:hidden;cursor:pointer;">
-            <div style="height:150px;background:linear-gradient(135deg,#${Math.random().toString(16).slice(2,8)},#333);display:flex;align-items:center;justify-content:center;">
-              <span style="font-size:48px;">▶️</span>
-            </div>
-            <div style="padding:8px;">
-              <strong>Video ${i+1}</strong>
-              <p style="font-size:12px;color:var(--text-secondary);">1.2K views · 2 days ago</p>
-            </div>
-          </div>
-        `).join('')}
+    <div style="background:var(--surface);border-radius:var(--radius-lg);padding:clamp(16px,3vw,20px);box-shadow:var(--shadow);">
+      <h2 style="font-size:clamp(18px,2.5vw,22px);margin-bottom:16px;">Watch</h2>
+      <div class="empty-state">
+        <div class="empty-icon">📺</div>
+        <h3>No videos yet</h3>
+        <p>Videos will appear here</p>
       </div>
     </div>
   `
@@ -1440,49 +1470,87 @@ function renderWatchPage() {
 
 function renderGroupsPage() {
   return `
-    <div style="background:white;border-radius:8px;padding:20px;">
-      <h2>Groups</h2>
-      ${['Gaming Community', 'Tech Enthusiasts', 'Food Lovers', 'Travel Buddies'].map(name => `
-        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--divider);">
-          <div style="width:60px;height:60px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:24px;">👥</div>
-          <div style="flex:1;">
-            <strong>${name}</strong>
-            <p style="font-size:12px;color:var(--text-secondary);">5.2K members</p>
-          </div>
-          <button style="background:var(--primary);color:white;border:none;padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;">
-            Join
-          </button>
-        </div>
-      `).join('')}
+    <div style="background:var(--surface);border-radius:var(--radius-lg);padding:clamp(16px,3vw,20px);box-shadow:var(--shadow);">
+      <h2 style="font-size:clamp(18px,2.5vw,22px);margin-bottom:16px;">Groups</h2>
+      <div class="empty-state">
+        <div class="empty-icon">👪</div>
+        <h3>No groups yet</h3>
+        <p>Join or create groups to see them here</p>
+      </div>
+      <button onclick="createGroup()" style="width:100%;margin-top:16px;padding:clamp(10px,1.5vw,12px);background:var(--secondary);color:white;border:none;border-radius:6px;font-size:clamp(14px,1.6vw,15px);font-weight:600;cursor:pointer;">
+        + Create New Group
+      </button>
     </div>
   `
 }
 
 function renderGenericPage(page) {
   return `
-    <div style="background:white;border-radius:8px;padding:40px;text-align:center;">
-      <div style="font-size:48px;margin-bottom:16px;">🚧</div>
+    <div style="background:var(--surface);border-radius:var(--radius-lg);padding:clamp(24px,4vw,40px);box-shadow:var(--shadow);" class="empty-state">
+      <div class="empty-icon">🚧</div>
       <h2>${page.charAt(0).toUpperCase() + page.slice(1)}</h2>
-      <p style="color:var(--text-secondary);">Coming soon!</p>
+      <p>Coming soon!</p>
     </div>
   `
 }
 
+// ==================== SIDEBAR CONTENT ====================
+function updateSidebarContent() {
+  const requestsContainer = document.getElementById('friend-requests-container')
+  const contactsContainer = document.getElementById('contacts-container')
+  
+  if (requestsContainer) {
+    if (friendRequests.length > 0) {
+      requestsContainer.innerHTML = friendRequests.map(req => `
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;">
+          <div class="user-avatar sm" style="background:${stringToColor(req.username || 'user')};flex-shrink:0;">
+            ${getInitials(req.username || 'U')}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(req.username || 'User')}</div>
+          </div>
+          <button onclick="acceptFriend('${req.id}')" style="background:var(--primary);color:white;border:none;padding:6px;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap;">Confirm</button>
+          <button onclick="rejectFriend('${req.id}')" style="background:var(--bg);border:none;padding:6px;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap;">Delete</button>
+        </div>
+      `).join('')
+    } else {
+      requestsContainer.innerHTML = '<div style="padding:8px 12px;color:var(--text-secondary);font-size:13px;">No new requests</div>'
+    }
+  }
+  
+  if (contactsContainer) {
+    if (friends.length > 0) {
+      contactsContainer.innerHTML = friends.slice(0, 10).map(friend => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='none'">
+          <div class="user-avatar sm" style="background:${stringToColor(friend.username || 'user')};flex-shrink:0;">
+            ${getInitials(friend.username || 'U')}
+          </div>
+          <span style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(friend.username || 'User')}</span>
+        </div>
+      `).join('')
+    } else {
+      contactsContainer.innerHTML = '<div style="padding:8px 12px;color:var(--text-secondary);font-size:13px;">No contacts yet</div>'
+    }
+  }
+}
+
 // ==================== POST ACTIONS ====================
 window.openCreatePost = function() {
-  document.getElementById('create-post-modal').classList.remove('hidden')
-  setTimeout(() => {
-    document.getElementById('new-post-content')?.focus()
-  }, 100)
+  const modal = document.getElementById('create-post-modal')
+  if (modal) {
+    modal.classList.remove('hidden')
+    setTimeout(() => document.getElementById('new-post-content')?.focus(), 100)
+  }
 }
 
 window.closeCreatePost = function() {
-  document.getElementById('create-post-modal').classList.add('hidden')
+  const modal = document.getElementById('create-post-modal')
+  if (modal) modal.classList.add('hidden')
 }
 
 window.createPost = async function() {
   const content = document.getElementById('new-post-content')?.value.trim()
-  if (!content) return showToast('Please write something')
+  if (!content) return showToast('Please write something to post')
   
   const submitBtn = document.getElementById('post-submit-btn')
   if (submitBtn) {
@@ -1497,11 +1565,12 @@ window.createPost = async function() {
   })
   
   if (error) {
-    showToast('Failed to post')
+    showToast('Failed to create post')
     console.error(error)
   } else {
     showToast('Posted! 🎉')
     closeCreatePost()
+    document.getElementById('new-post-content').value = ''
     await loadFeed()
   }
   
@@ -1525,6 +1594,7 @@ window.toggleLike = async function(postId, currentLikes, isLiked) {
     await loadFeed()
   } catch(e) {
     console.error('Like error:', e)
+    showToast('Failed to update like')
   }
 }
 
@@ -1533,29 +1603,76 @@ window.focusComment = function(postId) {
   if (input) input.focus()
 }
 
-window.addComment = function(postId) {
+window.addComment = async function(postId) {
   const input = document.getElementById(`comment-input-${postId}`)
-  if (input && input.value.trim()) {
-    showToast('Comment added! 💬')
+  if (!input || !input.value.trim()) return
+  
+  const content = input.value.trim()
+  
+  try {
+    const { error } = await supabase.from('comments').insert({
+      post_id: postId,
+      user_id: user.id,
+      content
+    })
+    
+    if (error) throw error
+    
     input.value = ''
-    // In full implementation, save to database
-    loadFeed()
+    showToast('Comment added 💬')
+    await loadFeed()
+  } catch(e) {
+    console.error('Comment error:', e)
+    showToast('Failed to add comment')
   }
 }
 
-window.showPostOptions = function(postId) {
-  showToast('Post options')
+// ==================== FRIEND ACTIONS ====================
+window.acceptFriend = async function(friendId) {
+  try {
+    await supabase
+      .from('friendships')
+      .update({ status: 'accepted' })
+      .eq('friend_id', user.id)
+      .eq('user_id', friendId)
+    
+    showToast('Friend request accepted! 🎉')
+    await loadAllUserData()
+    updateSidebarContent()
+  } catch(e) {
+    console.error('Accept friend error:', e)
+  }
+}
+
+window.rejectFriend = async function(friendId) {
+  try {
+    await supabase
+      .from('friendships')
+      .delete()
+      .eq('friend_id', user.id)
+      .eq('user_id', friendId)
+    
+    showToast('Friend request removed')
+    await loadAllUserData()
+    updateSidebarContent()
+  } catch(e) {
+    console.error('Reject friend error:', e)
+  }
+}
+
+window.createGroup = function() {
+  showToast('Group creation coming soon!')
 }
 
 // ==================== LOGOUT ====================
 window.handleLogout = async function() {
-  if (confirm('Are you sure you want to logout?')) {
-    await supabase.auth.signOut()
-    user = null
-    userProfile = null
-    userLikes.clear()
-    renderAuthPage('login')
-  }
+  await supabase.auth.signOut()
+  user = null
+  userProfile = null
+  userLikes.clear()
+  friends = []
+  friendRequests = []
+  renderAuthPage('login')
 }
 
 // ==================== HELPERS ====================
@@ -1576,7 +1693,7 @@ function showToast(message) {
 }
 
 function formatTimeAgo(dateString) {
-  if (!dateString) return 'Just now'
+  if (!dateString) return ''
   
   const date = new Date(dateString)
   const now = new Date()
@@ -1584,25 +1701,30 @@ function formatTimeAgo(dateString) {
   const diffMins = Math.floor(diffMs / 60000)
   
   if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m`
+  if (diffMins < 60) return `${diffMins}m ago`
   
   const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h`
+  if (diffHours < 24) return `${diffHours}h ago`
   
   const diffDays = Math.floor(diffHours / 24)
-  if (diffDays < 7) return `${diffDays}d`
+  if (diffDays < 7) return `${diffDays}d ago`
   
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const diffWeeks = Math.floor(diffDays / 7)
+  if (diffWeeks < 4) return `${diffWeeks}w ago`
+  
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined })
 }
 
 function escapeHtml(text) {
+  if (!text) return ''
   const div = document.createElement('div')
-  div.textContent = text || ''
+  div.textContent = text
   return div.innerHTML
 }
 
 function getInitials(name) {
-  return (name || 'U').charAt(0).toUpperCase()
+  if (!name) return 'U'
+  return name.charAt(0).toUpperCase()
 }
 
 function stringToColor(str) {
@@ -1610,14 +1732,21 @@ function stringToColor(str) {
   for (let i = 0; i < (str || '').length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash)
   }
-  const colors = ['#1877f2', '#e41e3f', '#42b72a', '#f7b928', '#764ba2', '#00a884', '#ff6b35']
+  const colors = ['#1877f2', '#e41e3f', '#42b72a', '#f7b928', '#764ba2', '#00a884', '#ff6b35', '#4a90d9', '#e95d6a', '#6c5ce7']
   return colors[Math.abs(hash) % colors.length]
 }
 
-// Close modal on overlay click
+// Modal overlay click
 document.addEventListener('click', function(e) {
   if (e.target.classList.contains('modal-overlay')) {
-    closeCreatePost()
+    window.closeCreatePost()
+  }
+})
+
+// Keyboard shortcut
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    window.closeCreatePost()
   }
 })
 
