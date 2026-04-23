@@ -3,39 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WEEM v3</title>
+<title>WEEM v3 - Social App</title>
 
 <style>
-body { font-family: Arial; margin:0; background:#eef2f7; }
-.container { max-width:520px; margin:auto; padding:15px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
 
-.card { background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; }
-.post { background:#fff; padding:12px; border-radius:12px; margin-bottom:10px; }
+.container { 
+  max-width: 600px; 
+  margin: 0 auto; 
+  padding: 20px;
+}
+
+.header {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.post {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.post:hover {
+  transform: translateY(-2px);
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
 
 input, textarea {
-  width:100%; padding:10px; margin:8px 0;
-  border-radius:8px; border:1px solid #ddd;
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e8ed;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
 button {
-  padding:10px; border:none; border-radius:8px;
-  cursor:pointer; color:white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
 }
 
-.blue { background:#1877f2; }
-.green { background:#28a745; }
-.gray { background:#555; }
-
-.header {
-  display:flex; justify-content:space-between; align-items:center;
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.small { font-size:12px; color:#888; }
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-outline { background: white; color: #667eea; border: 2px solid #667eea; }
 
-.like {
-  background:#f0f2f5; color:#333;
-  padding:6px 10px;
-  border-radius:20px;
+.post-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.post-content {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  background: #fff5f5;
+  color: #dc3545;
+  border: 1px solid #ffd0d0;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.like-btn:hover {
+  background: #ffe0e0;
+}
+
+.like-btn.liked {
+  background: #dc3545;
+  color: white;
+}
+
+.timestamp {
+  color: #999;
+  font-size: 12px;
+}
+
+.auth-links {
+  text-align: center;
+  margin-top: 15px;
+  color: #667eea;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
 }
 </style>
 </head>
@@ -47,212 +198,374 @@ button {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
 
 <script>
+// Configuration (in production, use environment variables)
 const SUPABASE_URL = "https://fghuggfaipwdtwpjsaon.supabase.co"
 const SUPABASE_KEY = "sb_publishable_OnbXuVmC_wOD3fC3f2jo2A_u0Gjp6oi"
 
 let supabase
 let user = null
+let userLikes = new Set() // Track user's liked posts
+
 const app = document.getElementById("app")
 
-// START
-loginUI()
-init()
-
-// ================= INIT =================
+// Initialize app
 async function init() {
-    try {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-
-        // CHECK SESSION (FIXED METHOD)
-        const { data } = await supabase.auth.getSession()
-
-        if (data?.session?.user) {
-            user = data.session.user
-            dashboard()
-        }
-
-        // LIVE AUTH LISTENER
-        supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.user) {
-                user = session.user
-                dashboard()
-            }
-        })
-
-    } catch (e) {
-        console.log(e)
-        app.innerHTML = "❌ Failed to connect to server"
-    }
-}
-
-// ================= LOGIN UI =================
-function loginUI() {
-    app.innerHTML = `
-    <div class="container">
-        <h2>WEEM</h2>
-
-        <div class="card">
-            <input id="email" placeholder="Email">
-            <input id="password" type="password" placeholder="Password">
-            <button class="blue" onclick="login()">Login</button>
-
-            <p onclick="signupUI()" style="cursor:pointer;color:#1877f2;">
-                Create account
-            </p>
-        </div>
-    </div>`
-}
-
-// ================= SIGNUP UI =================
-function signupUI() {
-    app.innerHTML = `
-    <div class="container">
-        <h2>Signup</h2>
-
-        <div class="card">
-            <input id="username" placeholder="Username">
-            <input id="email" placeholder="Email">
-            <input id="password" type="password" placeholder="Password">
-            <button class="green" onclick="signup()">Signup</button>
-
-            <p onclick="loginUI()" style="cursor:pointer;color:#1877f2;">
-                Back to login
-            </p>
-        </div>
-    </div>`
-}
-
-// ================= LOGIN =================
-window.login = async function() {
-    const email = document.getElementById("email").value
-    const password = document.getElementById("password").value
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email, password
-    })
-
-    if (error) return alert(error.message)
-
-    user = data.user
-    dashboard()
-}
-
-// ================= SIGNUP (FIXED) =================
-window.signup = async function() {
-    const username = document.getElementById("username").value
-    const email = document.getElementById("email").value
-    const password = document.getElementById("password").value
-
-    if (!username || !email || !password) {
-        return alert("Fill all fields")
-    }
-
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            data: { username }
-        }
-    })
-
-    if (error) return alert(error.message)
-
-    // FIX: handle session properly
-    if (data?.session) {
-        user = data.user
-        dashboard()
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    
+    // Check existing session
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (session?.user) {
+      user = session.user
+      await loadUserLikes()
+      renderDashboard()
     } else {
-        alert("Signup successful ✔ Check your email to confirm before login")
-        loginUI()
+      renderLogin()
     }
-}
-
-// ================= LOGOUT =================
-window.logout = async function() {
-    await supabase.auth.signOut()
-    user = null
-    loginUI()
-}
-
-// ================= DASHBOARD =================
-async function dashboard() {
-    const { data: posts } = await supabase
-        .from("posts")
-        .select("*")
-        .order("created_at", { ascending:false })
-
-    let html = ""
-
-    posts?.forEach(p => {
-        html += `
-        <div class="post">
-            <b>${p.title}</b>
-            <p>${p.content}</p>
-
-            <div class="small">
-                ${timeAgo(p.created_at)}
-            </div>
-
-            <button class="like" onclick="likePost('${p.id}', ${p.likes || 0})">
-                ❤️ ${p.likes || 0}
-            </button>
-        </div>`
+    
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        user = session.user
+        await loadUserLikes()
+        renderDashboard()
+      } else {
+        user = null
+        userLikes.clear()
+        renderLogin()
+      }
     })
+  } catch (error) {
+    console.error("Init error:", error)
+    app.innerHTML = '<div class="container"><div class="card"><p>❌ Failed to connect to server. Please try again later.</p></div></div>'
+  }
+}
 
-    app.innerHTML = `
+// Load user's likes from database
+async function loadUserLikes() {
+  if (!user) return
+  
+  const { data } = await supabase
+    .from('post_likes')
+    .select('post_id')
+    .eq('user_id', user.id)
+  
+  userLikes = new Set(data?.map(d => d.post_id) || [])
+}
+
+// Render login form
+function renderLogin() {
+  app.innerHTML = `
     <div class="container">
-
-        <div class="header">
-            <h3>${user.email}</h3>
-            <button class="gray" onclick="logout()">Logout</button>
+      <div style="text-align: center; padding: 40px 0; color: white;">
+        <h1 style="font-size: 48px; margin-bottom: 10px;">WEEM</h1>
+        <p style="font-size: 18px; opacity: 0.9;">Connect & Share</p>
+      </div>
+      
+      <div class="card">
+        <h2 style="margin-bottom: 20px;">Welcome Back</h2>
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="input-group">
+          <input id="email" type="email" placeholder="Email address" autocomplete="email">
         </div>
-
-        <div class="card">
-            <input id="title" placeholder="Title">
-            <textarea id="content" placeholder="What's on your mind?"></textarea>
-            <button class="blue" onclick="createPost()">Post</button>
+        
+        <div class="input-group">
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password">
         </div>
-
-        ${html || "<p>No posts yet</p>"}
-
-    </div>`
+        
+        <button class="btn-primary" onclick="handleLogin()" style="width: 100%;">
+          Login
+        </button>
+        
+        <p class="auth-links" onclick="renderSignup()">
+          Don't have an account? Sign up
+        </p>
+      </div>
+    </div>
+  `
 }
 
-// ================= CREATE POST =================
-window.createPost = async function() {
-    const title = document.getElementById("title").value
-    const content = document.getElementById("content").value
-
-    const { error } = await supabase.from("posts").insert({
-        user_id: user.id,
-        title,
-        content,
-        likes: 0
-    })
-
-    if (error) return alert(error.message)
-
-    dashboard()
+// Render signup form
+function renderSignup() {
+  app.innerHTML = `
+    <div class="container">
+      <div style="text-align: center; padding: 40px 0; color: white;">
+        <h1 style="font-size: 36px; margin-bottom: 10px;">Join WEEM</h1>
+      </div>
+      
+      <div class="card">
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="input-group">
+          <input id="username" placeholder="Choose a username">
+        </div>
+        
+        <div class="input-group">
+          <input id="email" type="email" placeholder="Email address">
+        </div>
+        
+        <div class="input-group">
+          <input id="password" type="password" placeholder="Create password (min 6 characters)">
+        </div>
+        
+        <button class="btn-success" onclick="handleSignup()" style="width: 100%;">
+          Create Account
+        </button>
+        
+        <p class="auth-links" onclick="renderLogin()">
+          Already have an account? Login
+        </p>
+      </div>
+    </div>
+  `
 }
 
-// ================= LIKE =================
-window.likePost = async function(id, likes) {
-    await supabase
-        .from("posts")
-        .update({ likes: likes + 1 })
-        .eq("id", id)
-
-    dashboard()
+// Handle login
+window.handleLogin = async function() {
+  const email = document.getElementById("email").value.trim()
+  const password = document.getElementById("password").value
+  
+  if (!email || !password) {
+    return showError("Please fill in all fields")
+  }
+  
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  
+  if (error) {
+    showError(error.message)
+  }
 }
 
-// ================= TIME =================
-function timeAgo(date) {
-    const diff = Math.floor((new Date() - new Date(date)) / 60000)
-
-    if (diff < 1) return "just now"
-    if (diff < 60) return diff + " min ago"
-    return Math.floor(diff / 60) + " hrs ago"
+// Handle signup
+window.handleSignup = async function() {
+  const username = document.getElementById("username").value.trim()
+  const email = document.getElementById("email").value.trim()
+  const password = document.getElementById("password").value
+  
+  if (!username || !email || !password) {
+    return showError("Please fill in all fields")
+  }
+  
+  if (password.length < 6) {
+    return showError("Password must be at least 6 characters")
+  }
+  
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { username }
+    }
+  })
+  
+  if (error) {
+    showError(error.message)
+  } else if (data?.session) {
+    // Auto-logged in
+    user = data.user
+    renderDashboard()
+  } else {
+    showError("Signup successful! Please check your email to confirm your account.", "success")
+    setTimeout(() => renderLogin(), 3000)
+  }
 }
+
+// Show error message
+function showError(message, type = 'error') {
+  const errorDiv = document.getElementById("error-message")
+  if (errorDiv) {
+    errorDiv.textContent = message
+    errorDiv.style.display = 'block'
+    errorDiv.style.background = type === 'success' ? '#efe' : '#fee'
+    errorDiv.style.color = type === 'success' ? '#3a3' : '#c33'
+    
+    setTimeout(() => {
+      errorDiv.style.display = 'none'
+    }, 5000)
+  }
+}
+
+// Handle logout
+window.handleLogout = async function() {
+  await supabase.auth.signOut()
+  user = null
+  userLikes.clear()
+  renderLogin()
+}
+
+// Render dashboard
+async function renderDashboard() {
+  // Show loading state
+  app.innerHTML = '<div class="container"><div class="loading">Loading posts...</div></div>'
+  
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(50)
+  
+  if (error) {
+    app.innerHTML = '<div class="container"><div class="card"><p>❌ Failed to load posts</p></div></div>'
+    return
+  }
+  
+  const userInitial = user.email?.[0]?.toUpperCase() || 'U'
+  
+  app.innerHTML = `
+    <div class="container">
+      <div class="header">
+        <div class="user-info">
+          <div class="avatar">${userInitial}</div>
+          <div>
+            <strong>${user.user_metadata?.username || user.email}</strong>
+            <div style="font-size: 12px; color: #999;">${user.email}</div>
+          </div>
+        </div>
+        <button class="btn-outline" onclick="handleLogout()">Logout</button>
+      </div>
+      
+      <div class="card">
+        <h3 style="margin-bottom: 15px;">Create Post</h3>
+        <div class="input-group">
+          <input id="post-title" placeholder="Post title" maxlength="100">
+        </div>
+        <div class="input-group">
+          <textarea id="post-content" placeholder="What's on your mind?" maxlength="500"></textarea>
+        </div>
+        <button class="btn-primary" onclick="handleCreatePost()" style="width: 100%;">
+          Share Post
+        </button>
+      </div>
+      
+      <div id="posts-container">
+        ${posts && posts.length > 0 
+          ? posts.map(post => renderPost(post)).join('')
+          : '<div class="empty-state">No posts yet. Be the first to share!</div>'
+        }
+      </div>
+    </div>
+  `
+}
+
+// Render individual post
+function renderPost(post) {
+  const isLiked = userLikes.has(post.id)
+  
+  return `
+    <div class="post">
+      <div class="post-title">${escapeHtml(post.title)}</div>
+      <div class="post-content">${escapeHtml(post.content)}</div>
+      
+      <div class="post-meta">
+        <div>
+          <button 
+            class="like-btn ${isLiked ? 'liked' : ''}" 
+            onclick="handleLike('${post.id}', ${post.likes || 0}, ${isLiked})"
+          >
+            ${isLiked ? '❤️' : '🤍'} ${post.likes || 0} likes
+          </button>
+        </div>
+        <span class="timestamp">${formatTimeAgo(post.created_at)}</span>
+      </div>
+    </div>
+  `
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+  const div = document.createElement('div')
+  div.textContent = text
+  return div.innerHTML
+}
+
+// Handle create post
+window.handleCreatePost = async function() {
+  const title = document.getElementById("post-title").value.trim()
+  const content = document.getElementById("post-content").value.trim()
+  
+  if (!title || !content) {
+    return alert("Please fill in both title and content")
+  }
+  
+  const { error } = await supabase.from("posts").insert({
+    user_id: user.id,
+    title,
+    content,
+    likes: 0
+  })
+  
+  if (error) {
+    alert("Failed to create post: " + error.message)
+  } else {
+    renderDashboard()
+  }
+}
+
+// Handle like/unlike
+window.handleLike = async function(postId, currentLikes, isLiked) {
+  if (!user) return
+  
+  try {
+    if (isLiked) {
+      // Unlike
+      await supabase
+        .from('post_likes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+      
+      await supabase
+        .from('posts')
+        .update({ likes: Math.max(0, currentLikes - 1) })
+        .eq('id', postId)
+      
+      userLikes.delete(postId)
+    } else {
+      // Like
+      await supabase
+        .from('post_likes')
+        .insert({
+          post_id: postId,
+          user_id: user.id
+        })
+      
+      await supabase
+        .from('posts')
+        .update({ likes: currentLikes + 1 })
+        .eq('id', postId)
+      
+      userLikes.add(postId)
+    }
+    
+    renderDashboard()
+  } catch (error) {
+    console.error("Like error:", error)
+  }
+}
+
+// Format timestamp
+function formatTimeAgo(dateString) {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now - date
+  const diffMins = Math.floor(diffMs / 60000)
+  
+  if (diffMins < 1) return 'just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+  
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays < 7) return `${diffDays}d ago`
+  
+  return date.toLocaleDateString()
+}
+
+// Start the app
+init()
 </script>
 
 </body>
