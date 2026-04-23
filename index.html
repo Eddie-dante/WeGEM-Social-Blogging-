@@ -3,222 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WEEM</title>
+<title>WEEM v2</title>
 
 <style>
-body { font-family: Arial; margin:0; background:#f0f2f5; }
-.container { max-width:500px; margin:auto; padding:20px; }
-.card { background:#fff; padding:20px; border-radius:10px; margin-bottom:15px; }
-input, textarea { width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd; }
-button { padding:12px; border:none; border-radius:8px; color:#fff; cursor:pointer; }
-.blue { background:#0066cc; }
+body { font-family: Arial; margin:0; background:#eef2f7; }
+.container { max-width:520px; margin:auto; padding:15px; }
+
+.card { background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; }
+.post { background:#fff; padding:12px; border-radius:12px; margin-bottom:10px; }
+
+input, textarea {
+  width:100%; padding:10px; margin:8px 0;
+  border-radius:8px; border:1px solid #ddd;
+}
+
+button {
+  padding:10px; border:none; border-radius:8px;
+  cursor:pointer; color:white;
+}
+
+.blue { background:#1877f2; }
 .green { background:#28a745; }
-.gray { background:#666; }
-.post { background:#fff; padding:15px; border-radius:10px; margin-bottom:10px; }
-.small { font-size:12px; color:#999; }
-.header { display:flex; justify-content:space-between; align-items:center; }
-.center { text-align:center; padding:40px; }
+.gray { background:#555; }
+
+.header {
+  display:flex; justify-content:space-between; align-items:center;
+}
+
+.small { font-size:12px; color:#888; }
+
+.like {
+  background:#f0f2f5; color:#333; padding:6px 10px;
+  border-radius:20px; font-size:13px;
+}
 </style>
 </head>
 
 <body>
 
-<div id="app" class="center">Loading app...</div>
+<div id="app"></div>
 
-<!-- ✅ Use jsdelivr (more reliable than unpkg) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+const SUPABASE_URL = "https://fghuggfaipwdtwpjsaon.supabase.co"
+const SUPABASE_KEY = "sb_publishable_OnbXuVmC_wOD3fC3f2jo2A_u0Gjp6oi"
 
-    // ================= CONFIG =================
-    const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
-    const SUPABASE_KEY = 'sb_publishable_OnbXuVmC_wOD3fC3f2jo2A_u0Gjp6oi'
+let supabase
+let user = null
+const app = document.getElementById("app")
 
-    const app = document.getElementById('app')
+// START FAST
+loginUI()
+init()
 
-    let supabase = null
-    let currentUser = null
-
-    // ================= START =================
-    loginPage() // show UI instantly
-    loadSupabase()
-
-    // ================= LOAD SUPABASE =================
-    function loadSupabase() {
-        if (!window.supabase) {
-            app.innerHTML = "❌ Supabase failed to load (check internet)"
-            return
-        }
-
+// INIT
+async function init() {
+    try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-        checkUser()
-    }
 
-    async function checkUser() {
-        try {
-            const { data } = await supabase.auth.getUser()
-            if (data?.user) {
-                currentUser = data.user
-                dashboard()
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }
+        const { data } = await supabase.auth.getSession()
 
-    // ================= AUTH UI =================
-    function loginPage() {
-        app.innerHTML = `
-        <div class="container">
-            <h2>WEEM</h2>
-            <div class="card">
-                <input id="email" placeholder="Email">
-                <input id="password" type="password" placeholder="Password">
-                <button class="blue" onclick="login()">Login</button>
-                <p>No account? <a href="#" onclick="signupPage()">Signup</a></p>
-            </div>
-        </div>`
-    }
-
-    function signupPage() {
-        app.innerHTML = `
-        <div class="container">
-            <h2>Signup</h2>
-            <div class="card">
-                <input id="username" placeholder="Username">
-                <input id="email" placeholder="Email">
-                <input id="password" type="password" placeholder="Password">
-                <button class="green" onclick="signup()">Signup</button>
-                <p><a href="#" onclick="loginPage()">Back</a></p>
-            </div>
-        </div>`
-    }
-
-    // ================= AUTH FUNCTIONS =================
-    window.login = async function() {
-        if (!supabase) return alert("Still connecting...")
-
-        const email = document.getElementById('email').value
-        const password = document.getElementById('password').value
-
-        if (!email || !password) return alert("Fill all fields")
-
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
-        if (error) return alert(error.message)
-
-        currentUser = data.user
-        dashboard()
-    }
-
-    window.signup = async function() {
-        if (!supabase) return alert("Still connecting...")
-
-        const username = document.getElementById('username').value
-        const email = document.getElementById('email').value
-        const password = document.getElementById('password').value
-
-        if (!username || !email || !password) return alert("Fill all fields")
-
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: { data: { username } }
-        })
-
-        if (error) return alert(error.message)
-
-        if (data?.user) {
-            await supabase.from('profiles').insert({
-                id: data.user.id,
-                username,
-                email
-            })
-
-            currentUser = data.user
+        if (data?.session?.user) {
+            user = data.session.user
             dashboard()
-        } else {
-            alert("Check your email to confirm signup")
         }
+    } catch (e) {
+        console.log(e)
+        app.innerHTML = "Failed to connect"
     }
 
-    window.logout = async function() {
-        await supabase.auth.signOut()
-        currentUser = null
-        loginPage()
-    }
-
-    // ================= DASHBOARD =================
-    async function dashboard() {
-        app.innerHTML = `<div class="center">Loading posts...</div>`
-
-        const { data: posts, error } = await supabase
-            .from('posts')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-        if (error) {
-            app.innerHTML = "❌ Database error: " + error.message
-            return
+    supabase.auth.onAuthStateChange((_, session) => {
+        if (session?.user) {
+            user = session.user
+            dashboard()
         }
+    })
+}
 
-        let html = ''
+// LOGIN UI
+function loginUI() {
+    app.innerHTML = `
+    <div class="container">
+        <h2>WEEM</h2>
+        <div class="card">
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+            <button class="blue" onclick="login()">Login</button>
+            <p onclick="signupUI()" style="cursor:pointer;color:#1877f2;">Create account</p>
+        </div>
+    </div>`
+}
 
-        posts?.forEach(p => {
-            html += `
-            <div class="post">
-                <b>${safe(p.title)}</b>
-                <p>${safe(p.content)}</p>
-                <div class="small">${new Date(p.created_at).toLocaleString()}</div>
-            </div>`
+// SIGNUP UI
+function signupUI() {
+    app.innerHTML = `
+    <div class="container">
+        <h2>Signup</h2>
+        <div class="card">
+            <input id="username" placeholder="Username">
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+            <button class="green" onclick="signup()">Signup</button>
+            <p onclick="loginUI()" style="cursor:pointer;color:#1877f2;">Back</p>
+        </div>
+    </div>`
+}
+
+// LOGIN
+window.login = async function() {
+    const email = email.value
+    const password = password.value
+
+    const { error } = await supabase.auth.signInWithPassword({
+        email, password
+    })
+
+    if (error) return alert(error.message)
+}
+
+// SIGNUP
+window.signup = async function() {
+    const username = username.value
+    const email = email.value
+    const password = password.value
+
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { username } }
+    })
+
+    if (error) return alert(error.message)
+
+    if (data?.user) {
+        await supabase.from("profiles").insert({
+            id: data.user.id,
+            username,
+            email
         })
 
-        app.innerHTML = `
-        <div class="container">
+        alert("Check email to confirm account")
+        loginUI()
+    }
+}
 
-            <div class="header">
-                <h3>${safe(currentUser.email)}</h3>
-                <button class="gray" onclick="logout()">Logout</button>
+// LOGOUT
+window.logout = async function() {
+    await supabase.auth.signOut()
+    user = null
+    loginUI()
+}
+
+// DASHBOARD
+async function dashboard() {
+    const { data: posts } = await supabase
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending:false })
+
+    let html = ""
+
+    posts?.forEach(p => {
+        html += `
+        <div class="post">
+            <b>${p.title}</b>
+            <p>${p.content}</p>
+
+            <div class="small">
+                ${timeAgo(p.created_at)}
             </div>
 
-            <div class="card">
-                <input id="title" placeholder="Title">
-                <textarea id="content" placeholder="Write something..."></textarea>
-                <button class="blue" onclick="createPost()">Post</button>
-            </div>
-
-            ${html || "<p>No posts yet</p>"}
-
+            <button class="like" onclick="likePost('${p.id}', ${p.likes || 0})">
+                ❤️ ${p.likes || 0}
+            </button>
         </div>`
-    }
+    })
 
-    // ================= POSTS =================
-    window.createPost = async function() {
-        const title = document.getElementById('title').value
-        const content = document.getElementById('content').value
+    app.innerHTML = `
+    <div class="container">
 
-        if (!title || !content) return alert("Fill all fields")
+        <div class="header">
+            <h3>${user.email}</h3>
+            <button class="gray" onclick="logout()">Logout</button>
+        </div>
 
-        const { error } = await supabase.from('posts').insert({
-            user_id: currentUser.id,
-            title,
-            content
-        })
+        <div class="card">
+            <input id="title" placeholder="Title">
+            <textarea id="content" placeholder="What's on your mind?"></textarea>
+            <button class="blue" onclick="createPost()">Post</button>
+        </div>
 
-        if (error) return alert(error.message)
+        ${html || "<p>No posts yet</p>"}
 
-        dashboard()
-    }
+    </div>`
+}
 
-    // ================= SECURITY =================
-    function safe(text) {
-        const div = document.createElement('div')
-        div.textContent = text
-        return div.innerHTML
-    }
+// CREATE POST
+window.createPost = async function() {
+    const title = title.value
+    const content = content.value
 
-})
+    const { error } = await supabase.from("posts").insert({
+        user_id: user.id,
+        title,
+        content,
+        likes: 0
+    })
+
+    if (error) return alert(error.message)
+
+    dashboard()
+}
+
+// LIKE POST
+window.likePost = async function(id, likes) {
+    await supabase
+        .from("posts")
+        .update({ likes: likes + 1 })
+        .eq("id", id)
+
+    dashboard()
+}
+
+// TIME AGO
+function timeAgo(date) {
+    const diff = Math.floor((new Date() - new Date(date)) / 60000)
+    if (diff < 1) return "just now"
+    if (diff < 60) return diff + " min ago"
+    return Math.floor(diff / 60) + " hrs ago"
+}
 </script>
 
 </body>
