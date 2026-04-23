@@ -1,1 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEEM</title>
 
+<style>
+body { font-family: Arial; margin:0; background:#f0f2f5; }
+.container { max-width:500px; margin:auto; padding:20px; }
+.card { background:#fff; padding:20px; border-radius:10px; margin-bottom:15px; }
+input, textarea { width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd; }
+button { padding:12px; border:none; border-radius:8px; color:#fff; cursor:pointer; }
+.blue { background:#0066cc; }
+.green { background:#28a745; }
+.gray { background:#666; }
+.post { background:#fff; padding:15px; border-radius:10px; margin-bottom:10px; }
+.small { font-size:12px; color:#999; }
+.header { display:flex; justify-content:space-between; align-items:center; }
+.center { text-align:center; padding:40px; }
+</style>
+</head>
+
+<body>
+
+<div id="app" class="center">Loading app...</div>
+
+<!-- ✅ Use jsdelivr (more reliable than unpkg) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // ================= CONFIG =================
+    const SUPABASE_URL = 'https://fghuggfaipwdtwpjsaon.supabase.co'
+    const SUPABASE_KEY = 'sb_publishable_OnbXuVmC_wOD3fC3f2jo2A_u0Gjp6oi'
+
+    const app = document.getElementById('app')
+
+    let supabase = null
+    let currentUser = null
+
+    // ================= START =================
+    loginPage() // show UI instantly
+    loadSupabase()
+
+    // ================= LOAD SUPABASE =================
+    function loadSupabase() {
+        if (!window.supabase) {
+            app.innerHTML = "❌ Supabase failed to load (check internet)"
+            return
+        }
+
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+        checkUser()
+    }
+
+    async function checkUser() {
+        try {
+            const { data } = await supabase.auth.getUser()
+            if (data?.user) {
+                currentUser = data.user
+                dashboard()
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    // ================= AUTH UI =================
+    function loginPage() {
+        app.innerHTML = `
+        <div class="container">
+            <h2>WEEM</h2>
+            <div class="card">
+                <input id="email" placeholder="Email">
+                <input id="password" type="password" placeholder="Password">
+                <button class="blue" onclick="login()">Login</button>
+                <p>No account? <a href="#" onclick="signupPage()">Signup</a></p>
+            </div>
+        </div>`
+    }
+
+    function signupPage() {
+        app.innerHTML = `
+        <div class="container">
+            <h2>Signup</h2>
+            <div class="card">
+                <input id="username" placeholder="Username">
+                <input id="email" placeholder="Email">
+                <input id="password" type="password" placeholder="Password">
+                <button class="green" onclick="signup()">Signup</button>
+                <p><a href="#" onclick="loginPage()">Back</a></p>
+            </div>
+        </div>`
+    }
+
+    // ================= AUTH FUNCTIONS =================
+    window.login = async function() {
+        if (!supabase) return alert("Still connecting...")
+
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+
+        if (!email || !password) return alert("Fill all fields")
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+        if (error) return alert(error.message)
+
+        currentUser = data.user
+        dashboard()
+    }
+
+    window.signup = async function() {
+        if (!supabase) return alert("Still connecting...")
+
+        const username = document.getElementById('username').value
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+
+        if (!username || !email || !password) return alert("Fill all fields")
+
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { username } }
+        })
+
+        if (error) return alert(error.message)
+
+        if (data?.user) {
+            await supabase.from('profiles').insert({
+                id: data.user.id,
+                username,
+                email
+            })
+
+            currentUser = data.user
+            dashboard()
+        } else {
+            alert("Check your email to confirm signup")
+        }
+    }
+
+    window.logout = async function() {
+        await supabase.auth.signOut()
+        currentUser = null
+        loginPage()
+    }
+
+    // ================= DASHBOARD =================
+    async function dashboard() {
+        app.innerHTML = `<div class="center">Loading posts...</div>`
+
+        const { data: posts, error } = await supabase
+            .from('posts')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+        if (error) {
+            app.innerHTML = "❌ Database error: " + error.message
+            return
+        }
+
+        let html = ''
+
+        posts?.forEach(p => {
+            html += `
+            <div class="post">
+                <b>${safe(p.title)}</b>
+                <p>${safe(p.content)}</p>
+                <div class="small">${new Date(p.created_at).toLocaleString()}</div>
+            </div>`
+        })
+
+        app.innerHTML = `
+        <div class="container">
+
+            <div class="header">
+                <h3>${safe(currentUser.email)}</h3>
+                <button class="gray" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="card">
+                <input id="title" placeholder="Title">
+                <textarea id="content" placeholder="Write something..."></textarea>
+                <button class="blue" onclick="createPost()">Post</button>
+            </div>
+
+            ${html || "<p>No posts yet</p>"}
+
+        </div>`
+    }
+
+    // ================= POSTS =================
+    window.createPost = async function() {
+        const title = document.getElementById('title').value
+        const content = document.getElementById('content').value
+
+        if (!title || !content) return alert("Fill all fields")
+
+        const { error } = await supabase.from('posts').insert({
+            user_id: currentUser.id,
+            title,
+            content
+        })
+
+        if (error) return alert(error.message)
+
+        dashboard()
+    }
+
+    // ================= SECURITY =================
+    function safe(text) {
+        const div = document.createElement('div')
+        div.textContent = text
+        return div.innerHTML
+    }
+
+})
+</script>
+
+</body>
+</html>
